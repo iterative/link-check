@@ -6,14 +6,10 @@
     "target": "es5",
     "jsx": "react",
     "esModuleInterop": true,
-    "lib": [ "es2019", "DOM", "ES6" ,"DOM.Iterable", "ScriptHost"],
+    "lib": ["es2019", "DOM", "ES6", "DOM.Iterable", "ScriptHost"],
     "sourceMap": true,
     "allowJs": true
   },
-  "include": [
-    "src/**/*"
-  ],
-  "exclude": [
-    "node_modules"
-  ]
+  "include": ["src/**/*"],
+  "exclude": ["node_modules"]
 }

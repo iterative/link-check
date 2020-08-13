@@ -35,5 +35,8 @@
     "micromatch": "^4.0.2",
     "minimist": "^1.2.5",
     "node-fetch": "^2.6.0"
-  }
+  },
+  "files": [
+    "dist/**/*"
+  ]
 }
