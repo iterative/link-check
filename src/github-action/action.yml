@@ -1,0 +1,19 @@
+name: "Link Check"
+description: "Check that all new links compared to master respond properly"
+inputs:
+  rootURL:
+    description: "The URL that root-relative links will have prepended to them"
+  exclusionFile:
+    description: >-
+      The path to a file in the repo that contains lines used to match and
+      exclude links from the link check. Uses micromatch.
+  fileFilter:
+    description: "A micromatch string that will limit the files the link checker will act on."
+outputs:
+  output:
+    description: "A JSON string with the test output to be handed to the Check Run"
+  conclusion:
+    description: "A GitHub Checks-compatible conclusion of the report"
+runs:
+  using: "node12"
+  main: "index.js"
