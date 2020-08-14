@@ -10,6 +10,7 @@
     "@actions/core": "^1.2.4",
     "@babel/core": "^7.11.1",
     "@babel/preset-env": "^7.11.0",
+    "@types/minimist": "^1.2.0",
     "@types/node-fetch": "^2.5.7",
     "@typescript-eslint/eslint-plugin": "^3.6.1",
     "babel-jest": "^26.2.2",

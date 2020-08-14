@@ -1,11 +1,11 @@
 import minimist from "minimist";
 import fs from "fs";
-import contentFromGitDiff from "../contentFrom/git-diff";
-import contentFromFilesystem from "../contentFrom/filesystem";
-import { asyncMap } from "../checkFileEntries";
-import formatEntries from "../formatEntries";
-import { checkFileEntries } from "../checkFileEntries";
-import buildFilter from "../buildFilter";
+import contentFromGitDiff from "./contentFrom/git-diff";
+import contentFromFilesystem from "./contentFrom/filesystem";
+import { asyncMap } from "./checkFileEntries";
+import formatEntries from "./formatEntries";
+import { checkFileEntries } from "./checkFileEntries";
+import buildFilter from "./buildFilter";
 
 const patternsOrGlobstar = (patterns) => {
   if (patterns) {
