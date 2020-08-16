@@ -42,7 +42,6 @@
   },
   "dependencies": {
     "@typescript-eslint/parser": "^3.9.0",
-    "bottleneck": "^2.19.5",
     "fast-glob": "^3.2.4",
     "micromatch": "^4.0.2",
     "minimist": "^1.2.5",

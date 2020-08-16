@@ -1,6 +1,6 @@
 import glob from "fast-glob";
 import fs from "fs";
-import { FileContentEntry } from "../checkFileEntries";
+import { FileContentEntry } from "../types";
 
 async function contentFromFilesystem({
   fileIncludePatterns = "**",
@@ -16,9 +16,9 @@ async function contentFromFilesystem({
     (filePath: string) =>
       ({
         filePath,
-        content: async (filePath: string) =>
+        content: async (filePathArg: string) =>
           new Promise((resolve, reject) =>
-            fs.readFile(filePath, (err, buffer) =>
+            fs.readFile(filePathArg, (err, buffer) =>
               err ? reject(err) : resolve(String(buffer))
             )
           ),

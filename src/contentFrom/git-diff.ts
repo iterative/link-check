@@ -1,8 +1,5 @@
 import { exec } from "child_process";
-import { FileContentEntry } from "../checkFileEntries";
-
-const getFirstGroups: (string, RegExp) => string[] = (input, regex) =>
-  Array.from(input.matchAll(regex), (x) => x[1]);
+import { FileContentEntry } from "../types";
 
 const getGitDiffPatchText: () => Promise<string> = async () =>
   new Promise((resolve, reject) => {

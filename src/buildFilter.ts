@@ -1,15 +1,12 @@
 import mm from "micromatch";
-import fs from "fs";
-import path from "path";
-
-const mmOptions = { bash: true };
 
 const buildFilter = (
   include: string | string[],
   exclude: string | string[]
-) => (subject) => {
+) => (subject: string): boolean => {
   return mm.isMatch(subject, include, {
     ignore: exclude,
+    bash: true,
   });
 };
 

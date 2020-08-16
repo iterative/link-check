@@ -1,22 +1,10 @@
 import minimist from "minimist";
-import fs from "fs";
 import contentFromGitDiff from "./contentFrom/git-diff";
 import contentFromFilesystem from "./contentFrom/filesystem";
-import { asyncMap } from "./checkFileEntries";
 import formatEntries from "./formatEntries";
 import { checkFileEntries } from "./checkFileEntries";
 import buildFilter from "./buildFilter";
-
-const patternsOrGlobstar = (patterns) => {
-  if (patterns) {
-    if (Array.isArray(patterns)) {
-      if (patterns.length > 0) return patterns;
-    } else {
-      return patterns;
-    }
-  }
-  return "**";
-};
+import patternsFromFiles, { patternsOrGlobstar } from "./getPatternsFromFiles";
 
 async function getContentEntries(options) {
   const { source }: { source: string } = options;
@@ -30,25 +18,6 @@ async function getContentEntries(options) {
     default:
       throw new Error(`link-check was provided unexpected source "${source}"!`);
   }
-}
-
-async function getFileLines(filePath: string): Promise<string[]> {
-  return new Promise((resolve, reject) =>
-    fs.readFile(filePath, (err, buffer) => {
-      if (err) return reject(err);
-      return resolve(String(buffer).split(/\n+/));
-    })
-  );
-}
-
-async function getAllFileLines(
-  filePaths: string[] | string | undefined
-): Promise<string[]> {
-  return Array.isArray(filePaths)
-    ? ([] as string[]).concat(
-        ...(await asyncMap<string, string[]>(getFileLines, filePaths))
-      )
-    : getFileLines(filePaths);
 }
 
 async function main() {
@@ -74,34 +43,19 @@ async function main() {
     "link-exclude-pattern": string | string[];
     "link-include-file": string | string[];
     "link-exclude-file": string | string[];
-  } = minimist(process.argv.slice(2)) as any;
+  } = minimist(process.argv.slice(2));
 
   const [
     linkIncludePatterns,
     linkExcludePatterns,
     fileIncludePatterns,
     fileExcludePatterns,
-  ]: [string[], string[], string[], string[]] = await asyncMap<
-    [string | string[] | undefined, string | string[] | undefined],
-    string[]
-  >(
-    async ([filenames, patterns = []]) =>
-      (
-        await (filenames === undefined
-          ? []
-          : Array.isArray(filenames)
-          ? getAllFileLines(filenames)
-          : getFileLines(filenames))
-      )
-        .concat(patterns)
-        .filter(Boolean),
-    [
-      [linkIncludeFiles, argLinkIncludePatterns],
-      [linkExcludeFiles, argLinkExcludePatterns],
-      [fileIncludeFiles, argFileIncludePatterns],
-      [fileExcludeFiles, argFileExcludePatterns],
-    ]
-  );
+  ] = await patternsFromFiles([
+    [linkIncludeFiles, argLinkIncludePatterns],
+    [linkExcludeFiles, argLinkExcludePatterns],
+    [fileIncludeFiles, argFileIncludePatterns],
+    [fileExcludeFiles, argFileExcludePatterns],
+  ]);
 
   const options = {
     source,
@@ -117,14 +71,20 @@ async function main() {
   const fileEntries = await getContentEntries(options);
   const checkedLinks = await checkFileEntries(fileEntries, options);
   const failCount = checkedLinks.reduce(
-    (acc, { checks }) =>
-      acc + checks.reduce((acc, check) => (check.pass ? acc : acc + 1), 0),
+    (fullAcc, { checks }) =>
+      fullAcc +
+      checks.reduce(
+        (fileAcc, check) => (check.pass ? fileAcc : fileAcc + 1),
+        0
+      ),
     0
   );
+
+  // eslint-disable-next-line no-console
   console.log(
-    formatEntries(checkedLinks) +
-      "\n\n" +
-      (failCount > 0 ? `${failCount} links failed.` : "All links passed!")
+    `${formatEntries(checkedLinks)}\n\n${
+      failCount > 0 ? `${failCount} links failed.` : "All links passed!"
+    }`
   );
   process.exit(0);
 }

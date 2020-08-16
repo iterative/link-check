@@ -1,5 +1,4 @@
-import { LinkCheck } from "./checkLink";
-import { FileChecksEntry } from "./checkFileEntries";
+import { LinkCheck, FileChecksEntry } from "./types";
 
 interface FormatterOptions {
   entryFormat?: (
@@ -8,39 +7,43 @@ interface FormatterOptions {
     index?: number
   ) => string;
   entrySeparator?: string;
-  fileFormat?: (FileChecksEntry) => string;
-  linkFormat?: (LinkCheck) => string;
+  fileFormat?: (fileEntry: FileChecksEntry) => string;
+  linkFormat?: (check: LinkCheck) => string;
   linkSeparator?: string;
 }
+
+const defaultFileFormat = ({ checks, filePath }) =>
+  `* ${checks.some((check) => !check.pass) ? "FAIL" : "PASS"}: ${filePath}\n`;
+
+const defaultLinkFormat = ({ link, href, description, pass }: LinkCheck) =>
+  `  - ${pass ? "PASS" : "FAIL"}: ${link}${
+    href ? ` = ${href}` : ""
+  } (${description})`;
+
+const defaultEntryFormat = (
+  { filePath, checks },
+  {
+    fileFormat = defaultFileFormat,
+    linkFormat = defaultLinkFormat,
+    linkSeparator = "\n",
+  }
+) =>
+  checks.length > 0
+    ? fileFormat({ filePath, checks }) +
+      checks
+        .sort((a, b) => {
+          if (a.pass === b.pass) return 0;
+          return a.pass ? 1 : -1;
+        })
+        .map(linkFormat)
+        .join(linkSeparator)
+    : null;
 
 const formatFileEntries: (
   fileCheckEntries: FileChecksEntry[],
   options?: FormatterOptions
 ) => string = (fileCheckEntries, options = {}) => {
-  const {
-    entryFormat = (
-      { filePath, checks },
-      {
-        fileFormat = ({ checks, filePath }) =>
-          `* ${
-            checks.some((check) => !check.pass) ? "FAIL" : "PASS"
-          }: ${filePath}\n`,
-        linkFormat = ({ link, href, description, pass }: LinkCheck) =>
-          `  - ${pass ? "PASS" : "FAIL"}: ${link}${
-            href ? ` = ${href}` : ""
-          } (${description})`,
-        linkSeparator = "\n",
-      }
-    ) =>
-      checks.length > 0
-        ? fileFormat({ filePath, checks }) +
-          checks
-            .sort((a, b) => (a.pass === b.pass ? 0 : a.pass ? 1 : -1))
-            .map(linkFormat)
-            .join(linkSeparator)
-        : null,
-    entrySeparator = "\n\n",
-  } = options;
+  const { entryFormat = defaultEntryFormat, entrySeparator = "\n\n" } = options;
   return fileCheckEntries
     .map((entry, i) => entryFormat(entry, options, i))
     .filter(Boolean)

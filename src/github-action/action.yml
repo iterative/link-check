@@ -3,12 +3,50 @@ description: "Check that all new links compared to master respond properly"
 inputs:
   rootURL:
     description: "The URL that root-relative links will have prepended to them"
-  exclusionFile:
+  linkIncludePatternFiles:
     description: >-
-      The path to a file in the repo that contains lines used to match and
-      exclude links from the link check. Uses micromatch.
-  fileFilter:
-    description: "A micromatch string that will limit the files the link checker will act on."
+      A string or JSON array of filenames to use as link inclusion files.
+      Read as one minimatch pattern per line.
+      If no include patterns are provided, all links are checked.
+    required: false
+  linkIncludePatterns:
+    description: >-
+      A string or JSON array of minimatch patterns to whitelist links.
+      If no include patterns are provided, all links are attempted.
+    required: false
+  linkExcludePatternFiles:
+    description: >-
+      A string or JSON array of filenames to use as link exclusion files.
+      Read as one minimatch pattern per line.
+    required: false
+  linkExcludePatterns:
+    description: >-
+      A string or JSON array of minimatch patterns to blacklist links.
+      Takes priority over inclusion patterns.
+    required: false
+
+  fileIncludePatternFiles:
+    description: >-
+      A string or JSON array of paths to read as link inclusion files.
+      Read as one minimatch pattern per line.
+      If no include patterns are provided, all files will be scraped for links.
+    required: false
+  fileIncludePatterns:
+    description: >-
+      A string or JSON array of minimatch patterns to whitelist files.
+      If no include patterns are provided, all files will be scraped for links.
+    required: false
+  fileExcludePatternFiles:
+    description: >-
+      A string or JSON array of paths to read as link exclusion files.
+      Read as one minimatch pattern per line.
+      Takes priority over inclusion patterns.
+    required: false
+  fileExcludePatterns:
+    description: >-
+      A string or JSON array of minimatch patterns to blacklist files.
+      Takes priority over inclusion patterns.
+    required: false
 outputs:
   output:
     description: "A JSON string with the test output to be handed to the Check Run"
