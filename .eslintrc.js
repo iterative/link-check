@@ -1,7 +1,45 @@
 module.exports = {
-  extends: ["airbnb-typescript-prettier"],
+  parser: "@typescript-eslint/parser",
   parserOptions: {
+    sourceType: "module",
     project: "./tsconfig.json",
+  },
+  extends: [
+    "airbnb-base",
+    "plugin:@typescript-eslint/recommended",
+    "prettier",
+    "prettier/@typescript-eslint",
+  ],
+  plugins: ["import", "prettier", "@typescript-eslint"],
+  env: {
+    browser: false,
+    es6: true,
+  },
+  rules: {
+    // prettier
+    "prettier/prettier": ["error"],
+    // TypeScript
+    "@typescript-eslint/no-unused-vars": "error",
+    "@typescript-eslint/explicit-member-accessibility": "off",
+    "@typescript-eslint/no-object-literal-type-assertion": "off",
+    // import
+    "import/extensions": [
+      "error",
+      "ignorePackages",
+      {
+        js: "never",
+        mjs: "never",
+        ts: "never",
+      },
+    ],
+  },
+  settings: {
+    "import/resolver": {
+      node: {
+        extensions: [".js", ".ts", ".json"],
+      },
+    },
+    "import/extensions": [".js", ".ts", ".mjs"],
   },
   overrides: [
     {

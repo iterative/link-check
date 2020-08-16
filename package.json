@@ -6,6 +6,12 @@
   "author": "RMP",
   "license": "MIT",
   "private": false,
+  "scripts": {
+    "build": "cross-env webpack -c webpack/all.js",
+    "lint": "cross-env eslint --cache --fix \"src/**/*.ts\"",
+    "format": "cross-env prettier --write \"**/*.{js,ts,json,yml}\"",
+    "commit": "cd github-actions; git commit -a && cd ../; git commit -a"
+  },
   "devDependencies": {
     "@actions/core": "^1.2.4",
     "@babel/core": "^7.11.1",
@@ -15,12 +21,14 @@
     "@typescript-eslint/eslint-plugin": "^3.6.1",
     "babel-jest": "^26.2.2",
     "copy-webpack-plugin": "^6.0.3",
-    "eslint": "^7.6.0",
-    "eslint-config-airbnb-typescript": "^9.0.0",
-    "eslint-config-airbnb-typescript-prettier": "^3.1.0",
-    "eslint-plugin-import": "^2.22.0",
+    "cross-env": "^7.0.2",
+    "eslint": "7.7.0",
+    "eslint-config-airbnb-base": "14.2.0",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-import": "^2.21.2",
+    "eslint-plugin-prettier": "^3.1.4",
     "husky": ">=4",
-    "jest": "^26.2.2",
+    "jest": "^26.4.0",
     "lint-staged": ">=10",
     "prettier": "^2.0.5",
     "terser-webpack-plugin": "^4.1.0",
@@ -33,7 +41,8 @@
     "webpack-node-externals": "^2.5.1"
   },
   "dependencies": {
-    "dotenv": "^8.2.0",
+    "@typescript-eslint/parser": "^3.9.0",
+    "bottleneck": "^2.19.5",
     "fast-glob": "^3.2.4",
     "micromatch": "^4.0.2",
     "minimist": "^1.2.5",
