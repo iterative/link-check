@@ -7,7 +7,6 @@ import formatEntries from "../formatEntries";
 import getPatternsFromFiles, {
   patternsOrGlobstar,
 } from "../getPatternsFromFiles";
-import buildFilter from "../buildFilter";
 import asyncMap from "../async-map";
 
 async function getInput(inputName: string): Promise<string | string[]> {
@@ -71,10 +70,8 @@ async function main() {
   const options = {
     source: "git-diff",
     rootURL: rootURL as string,
-    linkFilter: buildFilter(
-      patternsOrGlobstar(allLinkIncludePatterns),
-      allLinkExcludePatterns
-    ),
+    linkIncludePatterns: patternsOrGlobstar(allLinkIncludePatterns),
+    linkExcludePatterns: allLinkExcludePatterns,
     fileIncludePatterns: patternsOrGlobstar(allFileIncludePatterns),
     fileExcludePatterns: allFileExcludePatterns,
   };

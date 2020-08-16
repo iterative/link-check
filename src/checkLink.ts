@@ -1,5 +1,5 @@
 import fetch from "node-fetch";
-
+import mm from "micromatch";
 import { CheckLinkArgs, LinkCheck } from "./types";
 
 const fetchHeadOrGet = async (href: string) => {
@@ -20,37 +20,44 @@ const memoizedFetch = async (href: string) => {
 const checkLink: (options: CheckLinkArgs) => Promise<LinkCheck> = async ({
   link,
   url,
-  linkFilter,
+  linkIncludePatterns,
+  linkExcludePatterns,
 }) => {
-  if (typeof linkFilter === "function" && !linkFilter(link)) {
+  if (
+    mm.isMatch(link, linkIncludePatterns, {
+      exclude: linkExcludePatterns,
+      bash: true,
+    })
+  ) {
+    const { href } = url;
+    try {
+      const { status, ok } = await memoizedFetch(href);
+      return {
+        link,
+        // omit href if it and link are the exact same
+        href: link === href ? null : href,
+        description: status,
+        pass: ok,
+      };
+    } catch (e) {
+      return {
+        link,
+        href,
+        description: [
+          "Error",
+          e.code && ` ${e.code}`,
+          e.message && `: ${e.message}`,
+        ]
+          .filter(Boolean)
+          .join(""),
+        pass: false,
+      };
+    }
+  } else {
     return {
       link,
       description: "Excluded",
       pass: true,
-    };
-  }
-  const { href } = url;
-  try {
-    const { status, ok } = await memoizedFetch(href);
-    return {
-      link,
-      // omit href if it and link are the exact same
-      href: link === href ? null : href,
-      description: status,
-      pass: ok,
-    };
-  } catch (e) {
-    return {
-      link,
-      href,
-      description: [
-        "Error",
-        e.code && ` ${e.code}`,
-        e.message && `: ${e.message}`,
-      ]
-        .filter(Boolean)
-        .join(""),
-      pass: false,
     };
   }
 };

@@ -3,7 +3,6 @@ import contentFromGitDiff from "./contentFrom/git-diff";
 import contentFromFilesystem from "./contentFrom/filesystem";
 import formatEntries from "./formatEntries";
 import { checkFileEntries } from "./checkFileEntries";
-import buildFilter from "./buildFilter";
 import patternsFromFiles, { patternsOrGlobstar } from "./getPatternsFromFiles";
 
 async function getContentEntries(options) {
@@ -32,6 +31,7 @@ async function main() {
     "link-exclude-pattern": argLinkExcludePatterns,
     "link-include-file": linkIncludeFiles,
     "link-exclude-file": linkExcludeFiles,
+    "always-exit-zero": alwaysExitZero,
   }: {
     source: "git-diff" | "filesystem";
     rootURL: string;
@@ -43,6 +43,7 @@ async function main() {
     "link-exclude-pattern": string | string[];
     "link-include-file": string | string[];
     "link-exclude-file": string | string[];
+    "always-exit-zero": boolean;
   } = minimist(process.argv.slice(2));
 
   const [
@@ -60,33 +61,41 @@ async function main() {
   const options = {
     source,
     rootURL,
-    linkFilter: buildFilter(
-      patternsOrGlobstar(linkIncludePatterns),
-      linkExcludePatterns
-    ),
+    linkIncludePatterns: patternsOrGlobstar(linkIncludePatterns),
+    linkExcludePatterns,
     fileIncludePatterns: patternsOrGlobstar(fileIncludePatterns),
     fileExcludePatterns,
   };
 
   const fileEntries = await getContentEntries(options);
   const checkedLinks = await checkFileEntries(fileEntries, options);
-  const failCount = checkedLinks.reduce(
-    (fullAcc, { checks }) =>
-      fullAcc +
-      checks.reduce(
-        (fileAcc, check) => (check.pass ? fileAcc : fileAcc + 1),
-        0
-      ),
-    0
-  );
 
-  // eslint-disable-next-line no-console
-  console.log(
-    `${formatEntries(checkedLinks)}\n\n${
-      failCount > 0 ? `${failCount} links failed.` : "All links passed!"
-    }`
-  );
-  process.exit(0);
+  if (checkedLinks.length === 0) {
+    // eslint-disable-next-line no-console
+    console.log("There were no links to check!");
+    process.exit(0);
+  } else {
+    const reportBody = formatEntries(checkedLinks);
+    const failCount = checkedLinks.reduce(
+      (fullAcc, { checks }) =>
+        fullAcc +
+        checks.reduce(
+          (fileAcc, check) => (check.pass ? fileAcc : fileAcc + 1),
+          0
+        ),
+      0
+    );
+
+    if (failCount > 0) {
+      // eslint-disable-next-line no-console
+      console.log(`${reportBody}\n\n${failCount} links failed.`);
+      process.exit(alwaysExitZero ? 0 : 2);
+    } else {
+      // eslint-disable-next-line no-console
+      console.log(`${reportBody}\n\nAll links passed!`);
+      process.exit(0);
+    }
+  }
 }
 
 main();

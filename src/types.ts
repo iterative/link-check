@@ -17,15 +17,18 @@ export interface FileChecksEntry extends FileEntry {
   checks: LinkCheck[];
 }
 
-export interface CheckLinkOptions {
-  rootURL: string;
-  linkFilter?: (subject: string) => boolean;
+interface LinkSelectorPatterns {
+  linkIncludePatterns: string | string[] | undefined;
+  linkExcludePatterns: string | string[] | undefined;
 }
 
-export interface CheckLinkArgs {
+export interface CheckLinkOptions extends LinkSelectorPatterns {
+  rootURL?: string;
+}
+
+export interface CheckLinkArgs extends CheckLinkOptions {
   link: string;
   url: URL;
-  linkFilter?: (subject: string) => boolean;
 }
 
 export interface LinkCheck {

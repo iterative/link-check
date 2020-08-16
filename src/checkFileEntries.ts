@@ -22,7 +22,7 @@ export const checkFileEntry: (
   options: CheckLinkOptions
 ) => Promise<FileChecksEntry> = async (
   { filePath, content },
-  { rootURL, linkFilter }
+  { rootURL, linkIncludePatterns, linkExcludePatterns }
 ) => {
   const resolvedEntry = {
     filePath,
@@ -38,7 +38,8 @@ export const checkFileEntry: (
         const check = await checkLink({
           link,
           url,
-          linkFilter,
+          linkIncludePatterns,
+          linkExcludePatterns,
         } as CheckLinkArgs);
         return check;
       }
