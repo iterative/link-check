@@ -1,6 +1,6 @@
 {
   "name": "repo-link-check",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "A multi-target library for ensuring all links in a file are alive",
   "main": "index.js",
   "author": "RMP",
