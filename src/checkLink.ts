@@ -4,20 +4,37 @@ import Bottleneck from "bottleneck";
 import { CheckLinkArgs, LinkCheck } from "./types";
 
 const hostBottlenecks = {};
-const getBottleneck = ({ host, minTime = 1000, maxConcurrent = 1 }) => {
+const getBottleneck = ({ host, minTime = 250, maxConcurrent }) => {
   if (!hostBottlenecks[host]) {
     hostBottlenecks[host] = new Bottleneck({ minTime, maxConcurrent });
   }
   return hostBottlenecks[host];
 };
 
-const fetchHeadOrGet = async ({ href }: URL) => {
-  const res = await fetch(href, { method: "HEAD" });
-  return res.status === 405 ? fetch(href) : res;
-};
+const bottleneckedFetch: (
+  url: URL,
+  options: { method: string }
+) => Promise<Response> = async (url, options) =>
+  getBottleneck({ host: url.host }).schedule(() => fetch(url.href, options));
 
-const bottleneckedFetch = async (url: URL) =>
-  getBottleneck({ host: url.host }).schedule(() => fetchHeadOrGet(url));
+const fetchHeadOrGet = async (url: URL) => {
+  const res = await bottleneckedFetch(url, { method: "HEAD" });
+  if (res.status === 405) {
+    return bottleneckedFetch(url, { method: "GET" });
+  }
+  if (res.status === 429) {
+    const retryAfter = res.headers.get("retry-after");
+    if (retryAfter) {
+      const retryMs = Number(retryAfter) * 1000;
+      return new Promise((resolve) => {
+        setTimeout(async () => {
+          resolve(await fetchHeadOrGet(url));
+        }, retryMs);
+      });
+    }
+  }
+  return res;
+};
 
 const memo = {};
 const memoizedFetch = async (url: URL) => {
@@ -26,7 +43,7 @@ const memoizedFetch = async (url: URL) => {
   if (existing) {
     return existing;
   }
-  memo[href] = bottleneckedFetch(url);
+  memo[href] = fetchHeadOrGet(url);
   return memo[href];
 };
 
