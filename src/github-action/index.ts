@@ -93,6 +93,10 @@ async function main() {
     const markdownDescription = `# Link check report\n\n${formatEntries(
       checkEntries,
       {
+        fileFormat: ({ checks, filePath }) =>
+          `* ${
+            checks.some((check) => !check.pass) ? ":x:" : ":heavy_check_mark:"
+          }: ${filePath}\n`,
         linkFormat: ({ link, href, description, pass }) =>
           `  - ${pass ? ":heavy_check_mark:" : ":x:"} ${link}${
             href && href !== link ? ` = ${href}` : ""
