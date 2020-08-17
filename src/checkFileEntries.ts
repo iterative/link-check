@@ -1,3 +1,4 @@
+import Bottleneck from "bottleneck";
 import checkLink from "./checkLink";
 import scrapeLinks from "./scrapeLinks";
 import asyncMap from "./async-map";
@@ -54,10 +55,14 @@ export const checkFileEntry: (
 export const checkFileEntries: (
   fileContentEntries: FileContentEntry[],
   options?: CheckLinkOptions
-) => Promise<FileChecksEntry[]> = async (fileContentEntries, options) =>
-  (
+) => Promise<FileChecksEntry[]> = async (fileContentEntries, options) => {
+  const { maxConcurrent = 1, minTime = 333 } = options;
+  const limiter = new Bottleneck({ maxConcurrent, minTime });
+  return (
     await asyncMap<FileContentEntry, FileChecksEntry>(
       fileContentEntries,
-      (entry: FileContentEntry) => checkFileEntry(entry, options)
+      (entry: FileContentEntry) =>
+        checkFileEntry(entry, { ...options, limiter })
     )
   ).filter(Boolean);
+};

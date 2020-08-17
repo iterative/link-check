@@ -22,6 +22,7 @@ const checkLink: (options: CheckLinkArgs) => Promise<LinkCheck> = async ({
   url,
   linkIncludePatterns,
   linkExcludePatterns,
+  limiter,
 }) => {
   if (
     mm.isMatch(link, linkIncludePatterns, {
@@ -31,7 +32,9 @@ const checkLink: (options: CheckLinkArgs) => Promise<LinkCheck> = async ({
   ) {
     const { href } = url;
     try {
-      const { status, ok } = await memoizedFetch(href);
+      const { status, ok } = await (limiter
+        ? limiter.schedule(() => memoizedFetch(href))
+        : memoizedFetch(href));
       return {
         link,
         // omit href if it and link are the exact same

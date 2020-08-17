@@ -42,6 +42,7 @@
     "webpack-node-externals": "^2.5.1"
   },
   "dependencies": {
+    "bottleneck": "^2.19.5",
     "fast-glob": "^3.2.4",
     "micromatch": "^4.0.2",
     "minimist": "^1.2.5",
