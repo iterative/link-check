@@ -25,7 +25,7 @@ const checkLink: (options: CheckLinkArgs) => Promise<LinkCheck> = async ({
 }) => {
   if (
     mm.isMatch(link, linkIncludePatterns, {
-      exclude: linkExcludePatterns,
+      ignore: linkExcludePatterns,
       bash: true,
     })
   ) {
