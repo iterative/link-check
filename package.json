@@ -19,6 +19,7 @@
     "@types/minimist": "^1.2.0",
     "@types/node-fetch": "^2.5.7",
     "@typescript-eslint/eslint-plugin": "^3.6.1",
+    "@typescript-eslint/parser": "^3.9.0",
     "babel-jest": "^26.2.2",
     "copy-webpack-plugin": "^6.0.3",
     "cross-env": "^7.0.2",
@@ -41,7 +42,6 @@
     "webpack-node-externals": "^2.5.1"
   },
   "dependencies": {
-    "@typescript-eslint/parser": "^3.9.0",
     "fast-glob": "^3.2.4",
     "micromatch": "^4.0.2",
     "minimist": "^1.2.5",
