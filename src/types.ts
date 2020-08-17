@@ -26,7 +26,6 @@ export interface CheckLinkOptions extends LinkSelectorPatterns {
   rootURL?: string;
   minTime?: number;
   maxConcurrent?: number;
-  limiter?: unknown;
 }
 
 export interface CheckLinkArgs extends CheckLinkOptions {
