@@ -3,6 +3,7 @@ const path = require("path");
 module.exports = {
   context: path.join(__dirname, "..", "src"),
   mode: "production",
+  target: "node",
   optimization: {
     emitOnErrors: true,
   },

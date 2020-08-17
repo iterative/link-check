@@ -2,7 +2,6 @@ module.exports = {
   parser: "@typescript-eslint/parser",
   parserOptions: {
     sourceType: "module",
-    project: "./tsconfig.json",
   },
   extends: [
     "airbnb-base",
@@ -43,9 +42,22 @@ module.exports = {
   },
   overrides: [
     {
+      files: ["webpack/**/*.js"],
+      rules: {
+        "@typescript-eslint/no-var-requires": "off",
+      },
+    },
+    {
       files: ["*.test.js"],
       rules: {
         "no-undef": "off",
+      },
+    },
+    {
+      files: ["**/*.ts"],
+      parserOptions: {
+        sourceType: "module",
+        project: "./tsconfig.json",
       },
     },
   ],
