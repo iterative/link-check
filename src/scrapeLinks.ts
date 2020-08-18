@@ -20,9 +20,10 @@ const scrapeFromString: (filePath: string, content: string) => string[] = (
     case ".json":
       return matchAllPluck(content, /"(?:(?:https?:)?\/\/)?(?:)"/gm);
     default:
+      // credit to https://urlregex.com/
       return matchAllPluck(
         content,
-        /(?:https?:)?\/\/(?:\w+\.)?\w+.\w+(?:\/(?:\([^ ]*?\)|[^ ()])+)?/gm,
+        /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=+$,\w]+@)?[A-Za-z0-9.-]+|(?:www\.|[-;:&=+$,\w]+@)[A-Za-z0-9.-]+)((?:\/[+~%/.\w\-_]*)?\??(?:[-+=&;%@.\w_]*)#?(?:[.!\\\w]*))?)/gm,
         (x) => x[0]
       );
   }

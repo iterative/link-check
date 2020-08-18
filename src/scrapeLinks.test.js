@@ -8,6 +8,22 @@ and [another to reddit](www.reddit.com) and [a third to Twitter](facebook.com)
 as well as some blank lines
 `;
 
+const plaintextString = `
+This string is plaintext, with links like https://www.google.com and https://www.google.com/nested/page.html
+
+I can scrape "https://reddit.com/r/subreddit" and (https://facebook.com) as well!
+
+The new regex can pull www.youtube.com too!? unfortunately, gmail.com is just too vague.
+`;
+
+const plaintextTestResult = [
+  "https://www.google.com",
+  "https://www.google.com/nested/page.html",
+  "https://reddit.com/r/subreddit",
+  "https://facebook.com",
+  "www.youtube.com",
+];
+
 const markdownTestResult = [
   "https://www.google.com",
   "https://www.google.com/nested/page.html",
@@ -38,10 +54,7 @@ test("It scrapes absolute links from unrecognized extensions", () => {
   expect(
     scrapeLinks({
       filePath: "test",
-      content: testMarkdownString,
+      content: plaintextString,
     })
-  ).toEqual([
-    "https://www.google.com",
-    "https://www.google.com/nested/page.html",
-  ]);
+  ).toEqual(plaintextTestResult);
 });
