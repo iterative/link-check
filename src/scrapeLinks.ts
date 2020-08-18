@@ -1,12 +1,12 @@
 import path from "path";
 
-const matchAllPluck = (input, regex, pluck = (x) => x[1]) =>
+const matchAllPluck = (input: string, regex: RegExp, pluck = (x) => x[1]) =>
   Array.from(input.matchAll(regex), pluck);
 
-const scrapeFromString: (
-  filePath: string,
-  content: string | string[]
-) => string[] = (filePath, content) => {
+const scrapeFromString: (filePath: string, content: string) => string[] = (
+  filePath,
+  content
+) => {
   switch (path.extname(filePath)) {
     case ".md":
     case ".mdx":
@@ -20,7 +20,11 @@ const scrapeFromString: (
     case ".json":
       return matchAllPluck(content, /"(?:(?:https?:)?\/\/)?(?:)"/gm);
     default:
-      return [];
+      return matchAllPluck(
+        content,
+        /(?:https?:)?\/\/(?:\w+\.)?\w+.\w+(?:\/(?:\([^ ]*?\)|[^ ()])+)?/gm,
+        (x) => x[0]
+      );
   }
 };
 
