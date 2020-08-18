@@ -4,6 +4,7 @@ import contentFromFilesystem from "./contentFrom/filesystem";
 import formatEntries from "./formatEntries";
 import { checkFileEntries } from "./checkFileEntries";
 import patternsFromFiles, { patternsOrGlobstar } from "./getPatternsFromFiles";
+import { getUsedExcludePatterns } from "./checkLink";
 
 async function getContentEntries(options) {
   const { source }: { source: string } = options;
@@ -20,6 +21,7 @@ async function getContentEntries(options) {
 }
 
 async function main() {
+  let exitCode = 0;
   const {
     source = "git-diff",
     rootURL,
@@ -32,6 +34,7 @@ async function main() {
     "link-include-file": linkIncludeFiles,
     "link-exclude-file": linkExcludeFiles,
     "always-exit-zero": alwaysExitZero,
+    "report-unused-patterns": reportUnusedPatterns,
   }: {
     source: "git-diff" | "filesystem";
     rootURL: string;
@@ -44,6 +47,7 @@ async function main() {
     "link-include-file": string | string[];
     "link-exclude-file": string | string[];
     "always-exit-zero": boolean;
+    "report-unused-patterns": boolean;
   } = minimist(process.argv.slice(2));
 
   const [
@@ -73,7 +77,6 @@ async function main() {
   if (checkedLinks.length === 0) {
     // eslint-disable-next-line no-console
     console.log("There were no links to check!");
-    process.exit(0);
   } else {
     const reportBody = formatEntries(checkedLinks);
     const failCount = checkedLinks.reduce(
@@ -86,16 +89,31 @@ async function main() {
       0
     );
 
+    if (reportUnusedPatterns && linkExcludePatterns) {
+      const usedLinkExcludePatterns = getUsedExcludePatterns();
+      const unusedLinkExcludePatterns = linkExcludePatterns.filter(
+        (x) => !usedLinkExcludePatterns.has(x)
+      );
+      if (unusedLinkExcludePatterns.length > 1) {
+        // eslint-disable-next-line no-console
+        console.log(
+          `Some link ignore patterns were unused!\n\n${unusedLinkExcludePatterns.join(
+            "\n"
+          )}\n`
+        );
+      }
+    }
+
     if (failCount > 0) {
       // eslint-disable-next-line no-console
       console.log(`${reportBody}\n\n${failCount} links failed.`);
-      process.exit(alwaysExitZero ? 0 : 2);
+      if (!alwaysExitZero) exitCode = 2;
     } else {
       // eslint-disable-next-line no-console
       console.log(`${reportBody}\n\nAll links passed!`);
-      process.exit(0);
     }
   }
+  process.exit(exitCode);
 }
 
 main();

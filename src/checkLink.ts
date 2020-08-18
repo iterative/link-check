@@ -4,7 +4,7 @@ import Bottleneck from "bottleneck";
 import { CheckLinkArgs, LinkCheck } from "./types";
 
 const hostBottlenecks = {};
-const getBottleneck = ({ host, minTime = 250, maxConcurrent }) => {
+const getBottleneck = ({ host, minTime = 1000, maxConcurrent = 1 }) => {
   if (!hostBottlenecks[host]) {
     hostBottlenecks[host] = new Bottleneck({ minTime, maxConcurrent });
   }
@@ -17,7 +17,7 @@ const bottleneckedFetch: (
 ) => Promise<Response> = async (url, options) =>
   getBottleneck({ host: url.host }).schedule(() => fetch(url.href, options));
 
-const fetchHeadOrGet = async (url: URL) => {
+const fetchWithRetries = async (url: URL) => {
   const res = await bottleneckedFetch(url, { method: "HEAD" });
   if (res.status === 405) {
     return bottleneckedFetch(url, { method: "GET" });
@@ -28,7 +28,7 @@ const fetchHeadOrGet = async (url: URL) => {
       const retryMs = Number(retryAfter) * 1000;
       return new Promise((resolve) => {
         setTimeout(async () => {
-          resolve(await fetchHeadOrGet(url));
+          resolve(await fetchWithRetries(url));
         }, retryMs);
       });
     }
@@ -43,8 +43,35 @@ const memoizedFetch = async (url: URL) => {
   if (existing) {
     return existing;
   }
-  memo[href] = fetchHeadOrGet(url);
+  memo[href] = fetchWithRetries(url);
   return memo[href];
+};
+
+const usedExcludePatterns: Set<string> = new Set();
+export const getUsedExcludePatterns = (): Set<string> => usedExcludePatterns;
+const isMatch = (
+  link: string,
+  includePatterns: string | string[],
+  { ignore: excludePatterns, ...options }
+): boolean => {
+  if (mm.isMatch(link, includePatterns, options)) {
+    if (excludePatterns) {
+      if (Array.isArray(excludePatterns)) {
+        const excludingPattern = excludePatterns.find((excludePattern) =>
+          mm.isMatch(link, excludePattern, options)
+        );
+        if (excludingPattern) {
+          usedExcludePatterns.add(excludingPattern);
+          return false;
+        }
+      } else if (mm.isMatch(link, excludePatterns, options)) {
+        usedExcludePatterns.add(excludePatterns);
+        return false;
+      }
+    }
+    return true;
+  }
+  return false;
 };
 
 const checkLink: (options: CheckLinkArgs) => Promise<LinkCheck> = async ({
@@ -54,7 +81,7 @@ const checkLink: (options: CheckLinkArgs) => Promise<LinkCheck> = async ({
   linkExcludePatterns,
 }) => {
   if (
-    mm.isMatch(link, linkIncludePatterns, {
+    isMatch(link, linkIncludePatterns, {
       ignore: linkExcludePatterns,
       bash: true,
     })
