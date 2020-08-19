@@ -40,25 +40,24 @@ jobs:
     if: github.event.deployment_status.state == 'success'
 
     steps:
+      - uses: actions/checkout@v2
 
-    - uses: actions/checkout@v2
+      - name: Run the link checker
+        id: check
+        uses: "iterative/link-check.action@beta"
+        with:
+          rootURL: "${{ github.event.deployment.payload.web_url }}"
+          linkExcludePatternFiles: "./config/exclude-links"
+          fileExcludePatternFiles: "./config/exclude-files"
+          fileIncludePatterns: "content/**/*.{css,md,json}"
 
-    - name: Run the link checker
-      id: check
-      uses: "iterative/link-check.action@0.1"
-      with:
-        rootURL: "${{ github.event.deployment.payload.web_url }}"
-        linkExcludePatternFiles: "./config/exclude-links"
-        fileExcludePatternFiles: "./config/exclude-files"
-        fileIncludePatterns: "content/**/*.{css,md,json}"
-
-    - uses: LouisBrunner/checks-action@v0.1.0
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        name: Link Check
-        status: completed
-        conclusion: ${{ steps.check.outputs.conclusion }}
-        output: ${{ steps.check.outputs.output }}
+      - uses: LouisBrunner/checks-action@v0.1.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          name: Link Check
+          status: completed
+          conclusion: ${{ steps.check.outputs.conclusion }}
+          output: ${{ steps.check.outputs.output }}
 ```
 
 ## Options
@@ -113,14 +112,23 @@ Exclusions take precedence over inclusions.
 To specify multiple patterns or pattern files, use the relevant flag multiple times.
 
 ##### -s / --source
+
 ##### -r / --rootURL
+
 ##### --li / --link-include-pattern
+
 ##### --le / --link-exclude-pattern
+
 ##### --fi / --file-include-pattern
+
 ##### --fe / --file-exclude-pattern
+
 ##### --lif / --link-include-pattern-file
+
 ##### --lef / --link-exclude-pattern-file
+
 ##### --fif / --file-include-pattern-file
+
 ##### --fef / --file-exclude-pattern-file
 
 #### CLI-specific options
@@ -152,13 +160,21 @@ To specify multiple patterns or pattern files, provide a JSON-parsable array of
 strings as the relevant option's input.
 
 ##### rootURL
+
 ##### linkIncludePatternFiles
+
 ##### linkIncludePatterns
+
 ##### linkExcludePatternFiles
+
 ##### linkExcludePatterns
+
 ##### fileIncludePatternFiles
+
 ##### fileIncludePatterns
+
 ##### fileExcludePatternFiles
+
 ##### fileExcludePatterns
 
 ## Contributing
