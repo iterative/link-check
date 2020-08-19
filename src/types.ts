@@ -17,16 +17,13 @@ export interface FileChecksEntry extends FileEntry {
   checks: LinkCheck[];
 }
 
-interface LinkSelectorPatterns {
-  linkIncludePatterns: string | string[] | undefined;
-  linkExcludePatterns: string | string[] | undefined;
-}
-
 export interface CheckLinkOptions extends LinkSelectorPatterns {
   source?: string;
   rootURL?: string;
   minTime?: number;
   maxConcurrent?: number;
+  linkIncludePatterns: string | string[] | undefined;
+  linkExcludePatterns: string | string[] | undefined;
   fileIncludePatterns: string | string[] | undefined;
   fileExcludePatterns: string | string[] | undefined;
 }
