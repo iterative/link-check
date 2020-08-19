@@ -63,5 +63,5 @@ module.exports = {
       },
     },
   ],
-  ignorePatterns: ["dist/**", "github-action/**"],
+  ignorePatterns: ["/dist/**", "/github-action/**"],
 };
