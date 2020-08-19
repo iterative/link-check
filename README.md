@@ -135,8 +135,9 @@ To specify multiple patterns or pattern files, use the relevant flag multiple ti
 
 ##### -u / --report-unused-patterns
 
-When finished with the link check, log link exclusion patterns that weren't used.
-Generally, it only makes sense to use this on a full-repo filesystem check.
+If present, unused link exclusion patterns will be logged to the console above the check report.
+
+If set to "only", applies "dry-run" and skips report logging after reporting unused patterns.
 
 ##### -v / --verbose
 
@@ -151,6 +152,12 @@ applications running it from shell can break if a link fails.
 With this option specified, the CLI checker will always exit with code 0. This
 allows the link check to be run as optional in CI pipelines that run off exit
 codes.
+
+##### -d / --dry-run
+
+When this flag is present, no link checks will actually be run. Useful for
+debugging link patterns, as excluded links will have a description distinct from
+those stopped by the dry run alone.
 
 ### GitHub Action
 

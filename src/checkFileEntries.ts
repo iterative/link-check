@@ -26,7 +26,7 @@ export const checkFileEntry: (
   options: CheckLinkOptions
 ) => Promise<FileChecksEntry> = async (
   { filePath, content },
-  { rootURL, linkIncludePatterns, linkExcludePatterns }
+  { rootURL, linkIncludePatterns, linkExcludePatterns, dryRun }
 ) => {
   const resolvedEntry = {
     filePath,
@@ -45,6 +45,7 @@ export const checkFileEntry: (
           url,
           linkIncludePatterns,
           linkExcludePatterns,
+          dryRun,
         } as CheckLinkArgs);
         return check;
       }

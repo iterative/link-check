@@ -36,6 +36,7 @@ async function main() {
     "always-exit-zero": alwaysExitZero,
     "report-unused-patterns": reportUnusedPatterns,
     verbose,
+    "dry-run": dryRun = reportUnusedPatterns === "only",
   }: {
     source: "git-diff" | "filesystem";
     rootURL: string;
@@ -48,14 +49,16 @@ async function main() {
     "link-include-pattern-file": string | string[];
     "link-exclude-pattern-file": string | string[];
     "always-exit-zero": boolean;
-    "report-unused-patterns": boolean;
-    verbose: "boolean";
+    "report-unused-patterns": boolean | "only";
+    verbose: boolean;
+    "dry-run": boolean;
   } = minimist(process.argv.slice(2), {
     alias: {
       s: "source",
       u: "report-unused-patterns",
       r: "rootURL",
       z: "always-exit-zero",
+      d: "dry-run",
       li: "link-include-pattern",
       le: "link-exclude-pattern",
       fi: "file-include-pattern",
@@ -87,6 +90,7 @@ async function main() {
     linkExcludePatterns,
     fileIncludePatterns: patternsOrGlobstar(fileIncludePatterns),
     fileExcludePatterns,
+    dryRun,
   };
 
   if (verbose) console.log("Options:", options);
@@ -119,6 +123,11 @@ async function main() {
             "\n"
           )}\n`
         );
+        if (reportUnusedPatterns === "only") {
+          process.exit(alwaysExitZero ? 0 : 2);
+        }
+      } else if (reportUnusedPatterns === "only") {
+        process.exit(0);
       }
     }
 

@@ -17,7 +17,7 @@ export interface FileChecksEntry extends FileEntry {
   checks: LinkCheck[];
 }
 
-export interface CheckLinkOptions extends LinkSelectorPatterns {
+export interface CheckLinkOptions {
   source?: string;
   rootURL?: string;
   minTime?: number;
@@ -26,6 +26,7 @@ export interface CheckLinkOptions extends LinkSelectorPatterns {
   linkExcludePatterns: string | string[] | undefined;
   fileIncludePatterns: string | string[] | undefined;
   fileExcludePatterns: string | string[] | undefined;
+  dryRun: boolean;
 }
 
 export interface CheckLinkArgs extends CheckLinkOptions {

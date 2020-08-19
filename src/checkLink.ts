@@ -79,6 +79,7 @@ const checkLink: (options: CheckLinkArgs) => Promise<LinkCheck> = async ({
   url,
   linkIncludePatterns,
   linkExcludePatterns,
+  dryRun,
 }) => {
   if (
     isMatch(link, linkIncludePatterns, {
@@ -87,6 +88,14 @@ const checkLink: (options: CheckLinkArgs) => Promise<LinkCheck> = async ({
     })
   ) {
     const { href } = url;
+    if (dryRun) {
+      return {
+        link,
+        href: link === href ? null : href,
+        description: "Skipped because of dry-run",
+        pass: true,
+      };
+    }
     try {
       const { status, ok } = await memoizedFetch(url);
       return {
