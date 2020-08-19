@@ -23,9 +23,12 @@ interface LinkSelectorPatterns {
 }
 
 export interface CheckLinkOptions extends LinkSelectorPatterns {
+  source?: string;
   rootURL?: string;
   minTime?: number;
   maxConcurrent?: number;
+  fileIncludePatterns: string | string[] | undefined;
+  fileExcludePatterns: string | string[] | undefined;
 }
 
 export interface CheckLinkArgs extends CheckLinkOptions {

@@ -6,11 +6,11 @@ import { checkFileEntries } from "./checkFileEntries";
 import patternsFromFiles, { patternsOrGlobstar } from "./getPatternsFromFiles";
 import { getUsedExcludePatterns } from "./checkLink";
 
-async function getContentEntries(options) {
+async function getContentEntries(options: CheckLinkOptions) {
   const { source }: { source: string } = options;
   switch (source) {
     case "git-diff": {
-      return contentFromGitDiff();
+      return contentFromGitDiff(options);
     }
     case "filesystem": {
       return contentFromFilesystem(options);

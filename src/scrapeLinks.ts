@@ -29,7 +29,7 @@ const scrapeFromString: (filePath: string, content: string) => string[] = (
       // credit to https://urlregex.com/, but modified to only hit http/s protocol
       return matchAllPluck(
         content,
-        /(((https?:\/\/)(?:[-;:&=+$,\w]+@)?[A-Za-z0-9.-]+|(?:www\.|[-;:&=+$,\w]+@)[A-Za-z0-9.-]+)((?:\/[+~%/.\w\-_]*)?\??(?:[-+=&;%@.\w_]*)#?(?:[.!/\\\w]*))?)/gm,
+        /(((https?:\/\/)[A-Za-z0-9.-]+|(?:www\.)[A-Za-z0-9.-]+)((?:\/[+~%/.\w\-_]*)?\??(?:[-+=&;%@.\w_]*)#?(?:[.!/\\\w]*))?)/gm,
         (x) => x[0]
       );
   }
