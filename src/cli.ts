@@ -95,7 +95,6 @@ async function main() {
   const checkedLinks = await checkFileEntries(fileEntries, options);
 
   if (checkedLinks.length === 0) {
-    // eslint-disable-next-line no-console
     console.log("There were no links to check!");
   } else {
     const reportBody = formatEntries(checkedLinks);
@@ -115,7 +114,6 @@ async function main() {
         (x) => !usedLinkExcludePatterns.has(x)
       );
       if (unusedLinkExcludePatterns.length > 1) {
-        // eslint-disable-next-line no-console
         console.log(
           `Some link ignore patterns were unused!\n\n${unusedLinkExcludePatterns.join(
             "\n"
@@ -125,11 +123,9 @@ async function main() {
     }
 
     if (failCount > 0) {
-      // eslint-disable-next-line no-console
       console.log(`${reportBody}\n\n${failCount} links failed.`);
       if (!alwaysExitZero) exitCode = 2;
     } else {
-      // eslint-disable-next-line no-console
       console.log(`${reportBody}\n\nAll links passed!`);
     }
   }
