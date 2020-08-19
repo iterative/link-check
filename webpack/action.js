@@ -1,4 +1,3 @@
-const webpack = require("webpack");
 const TerserPlugin = require("terser-webpack-plugin");
 const CopyPlugin = require("copy-webpack-plugin");
 const path = require("path");
@@ -10,6 +9,10 @@ const actionConfig = {
   plugins: [
     new CopyPlugin({
       patterns: [
+        {
+          from: "../README.md",
+          to: "README.md",
+        },
         {
           from: "github-action/action.yml",
           to: "action.yml",

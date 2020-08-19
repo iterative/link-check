@@ -8,7 +8,7 @@
   "private": false,
   "scripts": {
     "build": "cross-env webpack -c webpack/all.js",
-    "lint": "cross-env eslint --cache --fix \"src/**/*.ts\"",
+    "lint": "cross-env eslint --cache --fix \"**/*.{js,ts}\"",
     "format": "cross-env prettier --write \"**/*.{js,ts,json,yml}\"",
     "commit": "cd github-actions; git commit -a && cd ../; git commit -a"
   },
@@ -62,6 +62,6 @@
   },
   "lint-staged": {
     "*.{js,ts}": "eslint --cache --fix",
-    "*.{js,ts,json}": "prettier --write"
+    "*.{js,ts,json,md}": "prettier --write"
   }
 }

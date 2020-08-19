@@ -46,6 +46,7 @@ module.exports = {
       files: ["webpack/**/*.js"],
       rules: {
         "@typescript-eslint/no-var-requires": "off",
+        "import/no-extraneous-dependencies": "off",
       },
     },
     {
@@ -62,4 +63,5 @@ module.exports = {
       },
     },
   ],
+  ignorePatterns: ["dist/**", "github-action/**"],
 };

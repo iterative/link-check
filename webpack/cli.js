@@ -1,7 +1,5 @@
 const webpack = require("webpack");
 const TerserPlugin = require("terser-webpack-plugin");
-const CopyPlugin = require("copy-webpack-plugin");
-const path = require("path");
 const { merge } = require("webpack-merge");
 const common = require("./common");
 
@@ -15,7 +13,7 @@ const cliConfig = {
     }),
   ],
   externals: ({ request }, cb) =>
-    /^\.+/.test(request) ? cb() : cb(null, "commonjs " + request),
+    /^\.+/.test(request) ? cb() : cb(null, `commonjs ${request}`),
   output: {
     filename: "cli.js",
   },
