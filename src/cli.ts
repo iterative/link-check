@@ -27,28 +27,46 @@ async function main() {
     rootURL,
     "file-include-pattern": argFileIncludePatterns,
     "file-exclude-pattern": argFileExcludePatterns,
-    "file-include-file": fileIncludeFiles,
-    "file-exclude-file": fileExcludeFiles,
+    "file-include-pattern-file": fileIncludeFiles,
+    "file-exclude-pattern-file": fileExcludeFiles,
     "link-include-pattern": argLinkIncludePatterns,
     "link-exclude-pattern": argLinkExcludePatterns,
-    "link-include-file": linkIncludeFiles,
-    "link-exclude-file": linkExcludeFiles,
+    "link-include-pattern-file": linkIncludeFiles,
+    "link-exclude-pattern-file": linkExcludeFiles,
     "always-exit-zero": alwaysExitZero,
     "report-unused-patterns": reportUnusedPatterns,
+    verbose,
   }: {
     source: "git-diff" | "filesystem";
     rootURL: string;
     "file-include-pattern": string | string[];
     "file-exclude-pattern": string | string[];
-    "file-include-file": string | string[];
-    "file-exclude-file": string | string[];
+    "file-include-pattern-file": string | string[];
+    "file-exclude-pattern-file": string | string[];
     "link-include-pattern": string | string[];
     "link-exclude-pattern": string | string[];
-    "link-include-file": string | string[];
-    "link-exclude-file": string | string[];
+    "link-include-pattern-file": string | string[];
+    "link-exclude-pattern-file": string | string[];
     "always-exit-zero": boolean;
     "report-unused-patterns": boolean;
-  } = minimist(process.argv.slice(2));
+    verbose: "boolean";
+  } = minimist(process.argv.slice(2), {
+    alias: {
+      s: "source",
+      u: "report-unused-patterns",
+      r: "rootURL",
+      z: "always-exit-zero",
+      li: "link-include-pattern",
+      le: "link-exclude-pattern",
+      fi: "file-include-pattern",
+      fe: "file-exclude-pattern",
+      lif: "link-include-pattern-file",
+      lef: "link-exclude-pattern-file",
+      fif: "file-include-pattern-file",
+      fef: "file-exclude-pattern-file",
+      v: "verbose",
+    },
+  });
 
   const [
     linkIncludePatterns,
@@ -70,6 +88,8 @@ async function main() {
     fileIncludePatterns: patternsOrGlobstar(fileIncludePatterns),
     fileExcludePatterns,
   };
+
+  if (verbose) console.log("Options:", options);
 
   const fileEntries = await getContentEntries(options);
   const checkedLinks = await checkFileEntries(fileEntries, options);
