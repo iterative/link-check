@@ -78,7 +78,7 @@ async function main() {
 
   await gitFetchPromise;
 
-  const fileEntries = await contentFromGitDiff();
+  const fileEntries = await contentFromGitDiff(options);
   const checkEntries = await checkFileEntries(fileEntries, options);
 
   if (checkEntries.length === 0) {
