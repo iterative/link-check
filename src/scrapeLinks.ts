@@ -9,21 +9,27 @@ const scrapeFromString: (filePath: string, content: string) => string[] = (
 ) => {
   switch (path.extname(filePath)) {
     case ".md":
-    case ".mdx":
-      return matchAllPluck(
+    case ".mdx": {
+      const links = matchAllPluck(
         content,
         /\[.*?\]\((?:<((?:\(.*?\)|.)*?)>|((?:\(.*?\)|.)*?))(?: ["'].*?["'])?\)/gm,
         (x) => x[2] || x[1]
       );
+      return links
+        ? links
+            .filter(Boolean)
+            .map((link) => (link.startsWith("/static") ? link.slice(7) : link))
+        : null;
+    }
     case ".html":
       return matchAllPluck(content, /href="(.*?)"/gm);
     case ".json":
       return matchAllPluck(content, /"(?:(?:https?:)?\/\/)?(?:)"/gm);
     default:
-      // credit to https://urlregex.com/
+      // credit to https://urlregex.com/, but modified to only hit http/s protocol
       return matchAllPluck(
         content,
-        /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=+$,\w]+@)?[A-Za-z0-9.-]+|(?:www\.|[-;:&=+$,\w]+@)[A-Za-z0-9.-]+)((?:\/[+~%/.\w\-_]*)?\??(?:[-+=&;%@.\w_]*)#?(?:[.!\\\w]*))?)/gm,
+        /(((https?:\/\/)(?:[-;:&=+$,\w]+@)?[A-Za-z0-9.-]+|(?:www\.|[-;:&=+$,\w]+@)[A-Za-z0-9.-]+)((?:\/[+~%/.\w\-_]*)?\??(?:[-+=&;%@.\w_]*)#?(?:[.!/\\\w]*))?)/gm,
         (x) => x[0]
       );
   }

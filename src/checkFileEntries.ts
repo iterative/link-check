@@ -11,10 +11,14 @@ import {
 } from "./types";
 
 const getURL = (link: string, rootURL: string | URL) => {
-  return new URL(
-    /^(https?:\/)?\//.test(link) ? link : `https://${link}`,
-    rootURL
-  );
+  try {
+    return new URL(
+      /^(https?:\/)?\//.test(link) ? link : `https://${link}`,
+      rootURL
+    );
+  } catch (e) {
+    return null;
+  }
 };
 
 export const checkFileEntry: (
@@ -35,6 +39,7 @@ export const checkFileEntry: (
       scrapeLinks(resolvedEntry),
       async (link: string) => {
         const url = getURL(link, rootURL);
+        if (!url) return null;
         const check = await checkLink({
           link,
           url,
