@@ -154,7 +154,8 @@ codes.
 
 ### GitHub Action
 
-#### Link Check Option Inputs
+The GitHub action accepts rootURL and all the pattern options as inputs.
+Notably, the GitHub action only operates on git diffs.
 
 To specify multiple patterns or pattern files, provide a JSON-parsable array of
 strings as the relevant option's input.
@@ -190,7 +191,14 @@ project to test on.
 The multi-target nature of this repo makes deploying more complex than usual,
 but still manageable if one knows how to do so.
 
-Here's the current flow:
+Here's the current flow to build and deploy a change to the action:
 
-1. Run `yarn build` with desired changes
-2. cd into the `github-action` subrepo
+1. Run `yarn build` with desired changes.
+
+2. If the rebuild caused the `github-action` submodule to change, cd in and commit the changes.
+
+3. Add the changed submodule, then commit the whole thing.
+
+4. Push with `--recurse-submodules=on-demand`, or otherwise push both repos.
+
+The CLI, on the other hand, is the standard `yarn build` and `yarn publish`.
