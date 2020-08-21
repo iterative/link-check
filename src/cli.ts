@@ -1,26 +1,10 @@
 import minimist from "minimist";
-import contentFromGitDiff from "./contentFrom/git-diff";
-import contentFromFilesystem from "./contentFrom/filesystem";
 import formatEntries from "./formatEntries";
 import { checkFileEntries } from "./checkFileEntries";
 import { optionsFromFile, mergeAndResolveOptions } from "./getOptions";
 import { getUnusedLinkExcludePatterns } from "./checkLink";
 import { CheckLinkOptions } from "./types";
-
-async function getContentEntries(options: CheckLinkOptions) {
-  const { source } = options;
-  switch (source) {
-    case undefined:
-    case "git-diff": {
-      return contentFromGitDiff(options);
-    }
-    case "filesystem": {
-      return contentFromFilesystem(options);
-    }
-    default:
-      throw new Error(`link-check was provided unexpected source "${source}"!`);
-  }
-}
+import getContentEntries from "./contentFrom/index";
 
 const optionsFromFlags: () => Promise<CheckLinkOptions> = async () => {
   const {

@@ -1,7 +1,7 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import * as core from "@actions/core";
 import { exec } from "child_process";
-import contentFromGitDiff from "../contentFrom/git-diff";
+import getContentEntries from "../contentFrom";
 import { checkFileEntries } from "../checkFileEntries";
 import formatEntries from "../formatEntries";
 import asyncMap from "../async-map";
@@ -31,6 +31,7 @@ async function optionsFromCoreInputs() {
   } = (
     await asyncMap<string, [string, string | string[] | boolean | undefined]>(
       [
+        "source",
         "configFile",
         "rootURL",
         "dryRun",
@@ -99,7 +100,7 @@ async function main() {
 
   await gitFetchPromise;
 
-  const fileEntries = await contentFromGitDiff(options);
+  const fileEntries = await getContentEntries(options);
   const checkEntries = await checkFileEntries(fileEntries, options);
 
   if (checkEntries.length === 0) {

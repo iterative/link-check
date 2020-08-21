@@ -3,6 +3,14 @@ description: "Check that all new links compared to master respond properly"
 inputs:
   rootURL:
     description: "The URL that root-relative links will have prepended to them"
+  source:
+    description: "The source to collect content entries from"
+  dryRun:
+    description: "Skip the check on links that otherwise would have one"
+  reportUnusedPatterns:
+    description: >-
+      If true, informs about all link exclusion patterns that went unused.
+      If set to "only", turns on dryRun and uses this check as the result.
   linkIncludePatternFiles:
     description: >-
       A string or JSON array of filenames to use as link inclusion files.
