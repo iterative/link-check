@@ -50,7 +50,7 @@ async function optionsFromCoreInputs() {
       async (name) => [name, await getInput(name)]
     )
   ).reduce((acc, [k, v]) => {
-    acc[k] = v;
+    if (v !== "") acc[k] = v;
     return acc;
   }, {}) as UnresolvedCheckLinkOptions;
 
