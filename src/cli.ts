@@ -3,12 +3,14 @@ import contentFromGitDiff from "./contentFrom/git-diff";
 import contentFromFilesystem from "./contentFrom/filesystem";
 import formatEntries from "./formatEntries";
 import { checkFileEntries } from "./checkFileEntries";
-import patternsFromFiles, { patternsOrGlobstar } from "./getPatternsFromFiles";
-import { getUsedExcludePatterns } from "./checkLink";
+import { optionsFromFile, mergeAndResolveOptions } from "./getOptions";
+import { getUnusedLinkExcludePatterns } from "./checkLink";
+import { CheckLinkOptions } from "./types";
 
 async function getContentEntries(options: CheckLinkOptions) {
-  const { source }: { source: string } = options;
+  const { source } = options;
   switch (source) {
+    case undefined:
     case "git-diff": {
       return contentFromGitDiff(options);
     }
@@ -20,24 +22,25 @@ async function getContentEntries(options: CheckLinkOptions) {
   }
 }
 
-async function main() {
-  let exitCode = 0;
+const optionsFromFlags: () => Promise<CheckLinkOptions> = async () => {
   const {
+    config,
     source = "git-diff",
     rootURL,
-    "file-include-pattern": argFileIncludePatterns,
-    "file-exclude-pattern": argFileExcludePatterns,
-    "file-include-pattern-file": fileIncludeFiles,
-    "file-exclude-pattern-file": fileExcludeFiles,
-    "link-include-pattern": argLinkIncludePatterns,
-    "link-exclude-pattern": argLinkExcludePatterns,
-    "link-include-pattern-file": linkIncludeFiles,
-    "link-exclude-pattern-file": linkExcludeFiles,
+    "file-include-pattern": fileIncludePatterns,
+    "file-exclude-pattern": fileExcludePatterns,
+    "file-include-pattern-file": fileIncludePatternFiles,
+    "file-exclude-pattern-file": fileExcludePatternFiles,
+    "link-include-pattern": linkIncludePatterns,
+    "link-exclude-pattern": linkExcludePatterns,
+    "link-include-pattern-file": linkIncludePatternFiles,
+    "link-exclude-pattern-file": linkExcludePatternFiles,
     "always-exit-zero": alwaysExitZero,
     "report-unused-patterns": reportUnusedPatterns,
     verbose,
     "dry-run": dryRun = reportUnusedPatterns === "only",
   }: {
+    config?: string;
     source: "git-diff" | "filesystem";
     rootURL: string;
     "file-include-pattern": string | string[];
@@ -54,6 +57,7 @@ async function main() {
     "dry-run": boolean;
   } = minimist(process.argv.slice(2), {
     alias: {
+      c: "config",
       s: "source",
       u: "report-unused-patterns",
       r: "rootURL",
@@ -71,32 +75,44 @@ async function main() {
     },
   });
 
-  const [
-    linkIncludePatterns,
-    linkExcludePatterns,
-    fileIncludePatterns,
-    fileExcludePatterns,
-  ] = await patternsFromFiles([
-    [linkIncludeFiles, argLinkIncludePatterns],
-    [linkExcludeFiles, argLinkExcludePatterns],
-    [fileIncludeFiles, argFileIncludePatterns],
-    [fileExcludeFiles, argFileExcludePatterns],
-  ]);
-
-  const options = {
+  const argsOptions = {
     source,
     rootURL,
-    linkIncludePatterns: patternsOrGlobstar(linkIncludePatterns),
-    linkExcludePatterns,
-    fileIncludePatterns: patternsOrGlobstar(fileIncludePatterns),
+    fileIncludePatterns,
     fileExcludePatterns,
+    fileIncludePatternFiles,
+    fileExcludePatternFiles,
+    linkIncludePatterns,
+    linkExcludePatterns,
+    linkIncludePatternFiles,
+    linkExcludePatternFiles,
+    alwaysExitZero,
+    reportUnusedPatterns,
+    verbose,
     dryRun,
   };
 
-  if (verbose) console.log("Options:", options);
+  const fileOptions = await optionsFromFile(config);
 
-  const fileEntries = await getContentEntries(options);
-  const checkedLinks = await checkFileEntries(fileEntries, options);
+  return mergeAndResolveOptions([argsOptions, fileOptions]);
+};
+
+async function main() {
+  let exitCode = 0;
+
+  const checkLinkOptions = await optionsFromFlags();
+
+  const {
+    alwaysExitZero,
+    reportUnusedPatterns,
+    linkExcludePatterns,
+    verbose,
+  } = checkLinkOptions;
+
+  if (verbose) console.log("Options:", checkLinkOptions);
+
+  const fileEntries = await getContentEntries(checkLinkOptions);
+  const checkedLinks = await checkFileEntries(fileEntries, checkLinkOptions);
 
   if (checkedLinks.length === 0) {
     console.log("There were no links to check!");
@@ -113,9 +129,8 @@ async function main() {
     );
 
     if (reportUnusedPatterns && linkExcludePatterns) {
-      const usedLinkExcludePatterns = getUsedExcludePatterns();
-      const unusedLinkExcludePatterns = linkExcludePatterns.filter(
-        (x) => !usedLinkExcludePatterns.has(x)
+      const unusedLinkExcludePatterns = getUnusedLinkExcludePatterns(
+        linkExcludePatterns
       );
       if (unusedLinkExcludePatterns.length > 1) {
         console.log(

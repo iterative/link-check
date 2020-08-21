@@ -17,6 +17,7 @@
     "@babel/core": "^7.11.1",
     "@babel/preset-env": "^7.11.0",
     "@babel/preset-typescript": "^7.10.4",
+    "@types/lodash": "^4.14.159",
     "@types/minimist": "^1.2.0",
     "@types/node-fetch": "^2.5.7",
     "@typescript-eslint/eslint-plugin": "^3.6.1",
@@ -45,6 +46,7 @@
   "dependencies": {
     "bottleneck": "^2.19.5",
     "fast-glob": "^3.2.4",
+    "lodash": "^4.17.20",
     "micromatch": "^4.0.2",
     "minimist": "^1.2.5",
     "node-fetch": "^2.6.0"

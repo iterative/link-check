@@ -48,7 +48,6 @@ const memoizedFetch = async (url: URL) => {
 };
 
 const usedExcludePatterns: Set<string> = new Set();
-export const getUsedExcludePatterns = (): Set<string> => usedExcludePatterns;
 const isMatch = (
   link: string,
   includePatterns: string | string[],
@@ -72,6 +71,12 @@ const isMatch = (
     return true;
   }
   return false;
+};
+
+export const getUnusedLinkExcludePatterns = (
+  allPatterns: string[]
+): string[] => {
+  return allPatterns.filter((x: string) => !usedExcludePatterns.has(x));
 };
 
 const checkLink: (options: CheckLinkArgs) => Promise<LinkCheck> = async ({

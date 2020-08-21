@@ -17,16 +17,31 @@ export interface FileChecksEntry extends FileEntry {
   checks: LinkCheck[];
 }
 
-export interface CheckLinkOptions {
+interface CoreCheckLinkOptions {
   source?: string;
   rootURL?: string;
-  minTime?: number;
-  maxConcurrent?: number;
-  linkIncludePatterns: string | string[] | undefined;
-  linkExcludePatterns: string | string[] | undefined;
-  fileIncludePatterns: string | string[] | undefined;
-  fileExcludePatterns: string | string[] | undefined;
-  dryRun: boolean;
+  reportUnusedPatterns?: boolean | "only";
+  dryRun?: boolean;
+  verbose?: boolean;
+  alwaysExitZero?: boolean;
+}
+
+export interface CheckLinkOptions extends CoreCheckLinkOptions {
+  linkIncludePatterns?: string[];
+  linkExcludePatterns?: string[];
+  fileIncludePatterns?: string[];
+  fileExcludePatterns?: string[];
+}
+
+export interface UnresolvedCheckLinkOptions extends CoreCheckLinkOptions {
+  linkIncludePatterns?: string | string[];
+  linkExcludePatterns?: string | string[];
+  fileIncludePatterns?: string | string[];
+  fileExcludePatterns?: string | string[];
+  linkIncludePatternFiles?: string | string[];
+  linkExcludePatternFiles?: string | string[];
+  fileIncludePatternFiles?: string | string[];
+  fileExcludePatternFiles?: string | string[];
 }
 
 export interface CheckLinkArgs extends CheckLinkOptions {
