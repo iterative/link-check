@@ -3,6 +3,8 @@ description: "Check that all new links compared to master respond properly"
 inputs:
   rootURL:
     description: "The URL that root-relative links will have prepended to them"
+  configFile:
+    description: "A JSON file in the repo used to configure the link check"
   source:
     description: "The source to collect content entries from"
   dryRun:
