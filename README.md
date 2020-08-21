@@ -27,40 +27,78 @@ This setup checks all files in the project-relative directory `/content` with `.
 
 ### GitHub Action
 
-Here's a basic example of a workflow to run link checks after a deploy preview succeeds and output the result to a GitHub Check Run.
+The Link Check can be run in a few different configurations, depending on what you'd like to check for.
+
+For example, this workflow checks the links against successful PR deploy:
 
 ```yaml
-name: My Link Check
+name: Link Check Deploy
 on: deployment_status
 
 jobs:
   run:
-    name: Run Link Checker
+    name: Link Check Deploy
     runs-on: ubuntu-latest
     if: github.event.deployment_status.state == 'success'
 
     steps:
       - uses: actions/checkout@v2
 
-      - name: Run the link checker
+      - name: Run the link check script
         id: check
-        uses: "iterative/link-check.action@beta"
+        uses: "iterative/link-check.action@master"
         with:
+          configFile: "./.linkcheckrc.json"
           rootURL: "${{ github.event.deployment.payload.web_url }}"
-          linkExcludePatternFiles: "./config/exclude-links"
-          fileExcludePatternFiles: "./config/exclude-files"
-          fileIncludePatterns: "content/**/*.{css,md,json}"
 
       - uses: LouisBrunner/checks-action@v0.1.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          name: Link Check
+          name: Link Check Deploy
           status: completed
           conclusion: ${{ steps.check.outputs.conclusion }}
           output: ${{ steps.check.outputs.output }}
 ```
 
+This workflow ensures that all link exclusion patterns are used throughout the repo:
+
+```
+name: Link Check Deploy
+on: deployment_status
+
+jobs:
+  run:
+    name: Link Check Deploy
+    runs-on: ubuntu-latest
+    if: github.event.deployment_status.state == 'success'
+
+    steps:
+
+    - uses: actions/checkout@v2
+
+    - name: Run the link check script
+      id: check
+      uses: "iterative/link-check.action@master"
+      with:
+        configFile: "./.linkcheckrc.json"
+        rootURL: "${{ github.event.deployment.payload.web_url }}"
+
+    - uses: LouisBrunner/checks-action@v0.1.0
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        name: Link Check Deploy
+        status: completed
+        conclusion: ${{ steps.check.outputs.conclusion }}
+        output: ${{ steps.check.outputs.output }}
+```
+
 ## Options
+
+### config: string
+
+When set by a runner, Link Check will look for a JSON config file relative to
+the root of the repo. Both the CLI and GHA runners can do this, which is
+particularly useful for sharing patterns between the two.
 
 ### source: "git-diff" | "filesystem" = "git-diff"
 
@@ -103,6 +141,17 @@ as its pattern will be completely excluded from checks and reports.
 
 Exclusions take precedence over inclusions.
 
+### dryRun: boolean
+
+When this option is true, no link checks will actually be run. Useful for
+debugging link patterns, as excluded links will have a description distinct from
+those stopped by the dry run alone.
+
+### reportUnusedPatterns: boolean | "only"
+
+If set to "only", applies dryRun and skips report logging after reporting unused patterns.
+If otherwise true, unused link exclusion patterns will be logged to output.
+
 ## Runners
 
 ### CLI
@@ -110,6 +159,8 @@ Exclusions take precedence over inclusions.
 #### Link Check option flags
 
 To specify multiple patterns or pattern files, use the relevant flag multiple times.
+
+##### -c / --config
 
 ##### -s / --source
 
@@ -131,13 +182,11 @@ To specify multiple patterns or pattern files, use the relevant flag multiple ti
 
 ##### --fef / --file-exclude-pattern-file
 
-#### CLI-specific options
+##### -d / --dry-run
 
 ##### -u / --report-unused-patterns
 
-If present, unused link exclusion patterns will be logged to the console above the check report.
-
-If set to "only", applies "dry-run" and skips report logging after reporting unused patterns.
+#### CLI-specific options
 
 ##### -v / --verbose
 
@@ -153,12 +202,6 @@ With this option specified, the CLI checker will always exit with code 0. This
 allows the link check to be run as optional in CI pipelines that run off exit
 codes.
 
-##### -d / --dry-run
-
-When this flag is present, no link checks will actually be run. Useful for
-debugging link patterns, as excluded links will have a description distinct from
-those stopped by the dry run alone.
-
 ### GitHub Action
 
 The GitHub action accepts rootURL and all the pattern options as inputs.
@@ -166,6 +209,8 @@ Notably, the GitHub action only operates on git diffs.
 
 To specify multiple patterns or pattern files, provide a JSON-parsable array of
 strings as the relevant option's input.
+
+##### configFile
 
 ##### rootURL
 
@@ -184,6 +229,10 @@ strings as the relevant option's input.
 ##### fileExcludePatternFiles
 
 ##### fileExcludePatterns
+
+##### dryRun
+
+##### reportUnusedPatterns
 
 ## Contributing
 
