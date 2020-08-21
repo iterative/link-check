@@ -118,6 +118,8 @@ async function main() {
         .join("\n\n");
       summarySegments.push(`Some link patterns were unused`);
       descriptionSegments.push(`# Unused match patterns\n\n${patternLines}`);
+    } else {
+      summarySegments.push(`All link patterns are used`);
     }
     if (reportUnusedPatterns === "only") {
       return conclude({
