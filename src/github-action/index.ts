@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 // eslint-disable-next-line import/no-extraneous-dependencies
 import * as core from "@actions/core";
 import { exec } from "child_process";
@@ -63,6 +64,11 @@ async function optionsFromCoreInputs() {
 const combineSegments = (segments: string[], sep: string): string =>
   segments && segments.length > 0 ? segments.join(sep) : undefined;
 
+interface CheckOutput {
+  summary: string;
+  text_description?: string;
+}
+
 const conclude = ({
   success,
   conclusion = success ? "success" : "failure",
@@ -79,7 +85,8 @@ const conclude = ({
   description?: string;
 }) => {
   core.setOutput("conclusion", conclusion);
-  const output = description ? { summary } : { summary, description };
+  const output: CheckOutput = { summary };
+  if (description) output.text_description = description;
   core.setOutput("output", JSON.stringify(output));
 };
 
@@ -108,6 +115,19 @@ async function main() {
       success: true,
     });
   }
+  descriptionSegments.push(
+    `# Checked Links\n\n${formatEntries(checkEntries, {
+      fileFormat: ({ checks, filePath }) =>
+        `* ${
+          checks.some((check) => !check.pass) ? ":x:" : ":heavy_check_mark:"
+        }: ${filePath}\n`,
+      linkFormat: ({ link, href, description, pass }) =>
+        `  - ${pass ? ":heavy_check_mark:" : ":x:"} ${link}${
+          href && href !== link ? ` = ${href}` : ""
+        } (${description})`,
+    })}`
+  );
+
   if (reportUnusedPatterns && linkExcludePatterns) {
     const unusedLinkExcludePatterns = getUnusedLinkExcludePatterns(
       linkExcludePatterns
@@ -138,19 +158,6 @@ async function main() {
     hasError
       ? "Some new links failed the check."
       : "All new links passed the check!"
-  );
-
-  descriptionSegments.push(
-    `# Link check report\n\n${formatEntries(checkEntries, {
-      fileFormat: ({ checks, filePath }) =>
-        `* ${
-          checks.some((check) => !check.pass) ? ":x:" : ":heavy_check_mark:"
-        }: ${filePath}\n`,
-      linkFormat: ({ link, href, description, pass }) =>
-        `  - ${pass ? ":heavy_check_mark:" : ":x:"} ${link}${
-          href && href !== link ? ` = ${href}` : ""
-        } (${description})`,
-    })}`
   );
 
   return conclude({
