@@ -66,5 +66,5 @@ export const checkFileEntries: (
       fileContentEntries,
       (entry: FileContentEntry) => checkFileEntry(entry, options)
     )
-  ).filter(Boolean);
+  ).filter((file) => file.checks.length > 0);
 };
