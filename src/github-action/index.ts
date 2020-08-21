@@ -112,7 +112,8 @@ async function main() {
     const unusedLinkExcludePatterns = getUnusedLinkExcludePatterns(
       linkExcludePatterns
     );
-    if (unusedLinkExcludePatterns.length > 1) {
+    const unusedPatternsExist = unusedLinkExcludePatterns.length > 1;
+    if (unusedPatternsExist) {
       const patternLines = unusedLinkExcludePatterns
         .map((pattern) => `  - ${pattern}`)
         .join("\n\n");
@@ -125,7 +126,7 @@ async function main() {
       return conclude({
         summarySegments,
         descriptionSegments,
-        success: false,
+        success: !unusedPatternsExist,
       });
     }
   }
