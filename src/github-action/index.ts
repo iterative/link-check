@@ -93,6 +93,8 @@ async function main() {
 
   const options = await optionsFromCoreInputs();
 
+  console.log("Options:", options);
+
   const summarySegments = [];
   const descriptionSegments = [];
 
