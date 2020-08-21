@@ -70,7 +70,6 @@ const conclude = ({
   descriptionSegments,
   summary = combineSegments(summarySegments, ", "),
   description = combineSegments(descriptionSegments, "\n\n"),
-  exit = success ? 0 : 2,
 }: {
   success?: boolean;
   conclusion?: "success" | "failure";
@@ -78,12 +77,10 @@ const conclude = ({
   descriptionSegments?: string[];
   summary?: string;
   description?: string;
-  exit?: number;
 }) => {
   core.setOutput("conclusion", conclusion);
   const output = description ? { summary } : { summary, description };
   core.setOutput("output", JSON.stringify(output));
-  process.exit(exit);
 };
 
 async function main() {
