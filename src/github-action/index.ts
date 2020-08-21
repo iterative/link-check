@@ -9,7 +9,7 @@ import asyncMap from "../async-map";
 
 import { optionsFromFile, mergeAndResolveOptions } from "../getOptions";
 import { getUnusedLinkExcludePatterns } from "../checkLink";
-import { UnresolvedCheckLinkOptions } from "../types";
+import { UnresolvedCheckLinkOptions, FileChecksEntry } from "../types";
 
 async function getInput(inputName: string): Promise<string | string[]> {
   const input = await core.getInput(inputName);
@@ -90,6 +90,23 @@ const conclude = ({
   core.setOutput("output", JSON.stringify(output));
 };
 
+function reduceCheckEntriesToErrors(
+  entries: FileChecksEntry[]
+): FileChecksEntry[] {
+  return entries.reduce((acc, { filePath, checks }) => {
+    const failedChecks = checks.filter((check) => !check.pass);
+    return failedChecks.length > 0
+      ? [
+          ...acc,
+          {
+            filePath,
+            checks: failedChecks,
+          },
+        ]
+      : acc;
+  }, []);
+}
+
 async function main() {
   const gitFetchPromise = new Promise((resolve, reject) => {
     exec("git fetch origin master", (err) => (err ? reject(err) : resolve()));
@@ -115,18 +132,6 @@ async function main() {
       success: true,
     });
   }
-  descriptionSegments.push(
-    `# Checked Links\n\n${formatEntries(checkEntries, {
-      fileFormat: ({ checks, filePath }) =>
-        `* ${
-          checks.some((check) => !check.pass) ? ":x:" : ":heavy_check_mark:"
-        }: ${filePath}\n`,
-      linkFormat: ({ link, href, description, pass }) =>
-        `  - ${pass ? ":heavy_check_mark:" : ":x:"} ${link}${
-          href && href !== link ? ` = ${href}` : ""
-        } (${description})`,
-    })}`
-  );
 
   if (reportUnusedPatterns && linkExcludePatterns) {
     const unusedLinkExcludePatterns = getUnusedLinkExcludePatterns(
@@ -151,14 +156,22 @@ async function main() {
     }
   }
 
-  const hasError = checkEntries.some(({ checks }) =>
-    checks.some(({ pass }) => !pass)
-  );
-  summarySegments.push(
-    hasError
-      ? "Some new links failed the check."
-      : "All new links passed the check!"
-  );
+  const failedChecks = reduceCheckEntriesToErrors(checkEntries);
+  const hasError = failedChecks.length > 0;
+  if (hasError) {
+    summarySegments.push("Some new links failed the check.");
+    descriptionSegments.push(
+      `# Failed checks\n\n${formatEntries(failedChecks, {
+        fileFormat: ({ filePath }) => `* ${filePath}\n`,
+        linkFormat: ({ link, href, description }) =>
+          `  - ${link}${
+            href && href !== link ? ` = ${href}` : ""
+          } (${description})`,
+      })}`
+    );
+  } else {
+    summarySegments.push("All new links passed the check!");
+  }
 
   return conclude({
     summarySegments,
