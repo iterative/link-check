@@ -24,6 +24,7 @@ interface CoreCheckLinkOptions {
   dryRun?: boolean;
   verbose?: boolean;
   alwaysExitZero?: boolean;
+  bottlenecks?: Map<string, BottleneckOptions>;
 }
 
 export interface CheckLinkOptions extends CoreCheckLinkOptions {
@@ -44,7 +45,7 @@ export interface UnresolvedCheckLinkOptions extends CoreCheckLinkOptions {
   fileExcludePatternFiles?: string | string[];
 }
 
-export interface CheckLinkArgs extends CheckLinkOptions {
+export interface CheckLinkArgs {
   link: string;
   url: URL;
 }
@@ -65,7 +66,7 @@ export interface AfterCheckAPI extends OnCheckAPI {
   check: LinkCheck;
 }
 
-export interface LinkCheckRateLimiter {
-  pattern: string | string[];
-  queue: unknown;
+export interface BottleneckOptions {
+  minTime: number;
+  maxConcurrent: number;
 }

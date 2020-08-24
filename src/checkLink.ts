@@ -1,26 +1,51 @@
 import fetch from "node-fetch";
 import mm from "micromatch";
 import Bottleneck from "bottleneck";
-import { CheckLinkArgs, LinkCheck } from "./types";
+import {
+  CheckLinkArgs,
+  CheckLinkOptions,
+  LinkCheck,
+  BottleneckOptions,
+} from "./types";
 
 const hostBottlenecks = {};
-const getBottleneck = ({ host, minTime = 1000, maxConcurrent = 1 }) => {
-  if (!hostBottlenecks[host]) {
-    hostBottlenecks[host] = new Bottleneck({ minTime, maxConcurrent });
+const getBottleneck = (hostname: string, options: CheckLinkOptions) => {
+  if (!hostBottlenecks[hostname]) {
+    const bottleneckOverrideEntry = Object.entries(
+      options.bottlenecks
+    ).find(([pattern]) => mm.isMatch(hostname, pattern));
+    const {
+      minTime = 400,
+      maxConcurrent = 1,
+    }: BottleneckOptions = bottleneckOverrideEntry
+      ? bottleneckOverrideEntry[1]
+      : {};
+    hostBottlenecks[hostname] = new Bottleneck({ minTime, maxConcurrent });
   }
-  return hostBottlenecks[host];
+  return hostBottlenecks[hostname];
 };
 
 const bottleneckedFetch: (
   url: URL,
-  options: { method: string }
-) => Promise<Response> = async (url, options) =>
-  getBottleneck({ host: url.host }).schedule(() => fetch(url.href, options));
+  fetchOptions: { method: string },
+  options: CheckLinkOptions
+) => Promise<Response> = async (url, fetchOptions, options) =>
+  getBottleneck(url.hostname, options).schedule(() =>
+    fetch(url.href, fetchOptions)
+  );
 
-const fetchWithRetries = async (url: URL) => {
-  const res = await bottleneckedFetch(url, { method: "HEAD" });
+const fetchWithRetries = async (
+  url: URL,
+  fetchOptions = {},
+  options: CheckLinkOptions
+) => {
+  const res = await bottleneckedFetch(
+    url,
+    { ...fetchOptions, method: "HEAD" },
+    options
+  );
   if (res.status === 405) {
-    return bottleneckedFetch(url, { method: "GET" });
+    return bottleneckedFetch(url, { ...fetchOptions, method: "GET" }, options);
   }
   if (res.status === 429) {
     const retryAfter = res.headers.get("retry-after");
@@ -28,7 +53,7 @@ const fetchWithRetries = async (url: URL) => {
       const retryMs = Number(retryAfter) * 1000;
       return new Promise((resolve) => {
         setTimeout(async () => {
-          resolve(await fetchWithRetries(url));
+          resolve(await fetchWithRetries(url, fetchOptions, options));
         }, retryMs);
       });
     }
@@ -37,13 +62,13 @@ const fetchWithRetries = async (url: URL) => {
 };
 
 const memo = {};
-const memoizedFetch = async (url: URL) => {
+const memoizedFetch = async (url: URL, options: CheckLinkOptions) => {
   const { href } = url;
   const existing = memo[href];
   if (existing) {
     return existing;
   }
-  memo[href] = fetchWithRetries(url);
+  memo[href] = fetchWithRetries(url, {}, options);
   return memo[href];
 };
 
@@ -79,13 +104,11 @@ export const getUnusedLinkExcludePatterns = (
   return allPatterns.filter((x: string) => !usedExcludePatterns.has(x));
 };
 
-const checkLink: (options: CheckLinkArgs) => Promise<LinkCheck> = async ({
-  link,
-  url,
-  linkIncludePatterns,
-  linkExcludePatterns,
-  dryRun,
-}) => {
+const checkLink: (
+  linkDef: CheckLinkArgs,
+  options: CheckLinkOptions
+) => Promise<LinkCheck> = async ({ link, url }, options) => {
+  const { linkIncludePatterns, linkExcludePatterns, dryRun } = options;
   if (
     isMatch(link, linkIncludePatterns, {
       ignore: linkExcludePatterns,
@@ -102,7 +125,7 @@ const checkLink: (options: CheckLinkArgs) => Promise<LinkCheck> = async ({
       };
     }
     try {
-      const { status, ok } = await memoizedFetch(url);
+      const { status, ok } = await memoizedFetch(url, options);
       return {
         link,
         // omit href if it and link are the exact same

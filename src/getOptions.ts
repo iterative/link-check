@@ -84,6 +84,7 @@ export const mergeAndResolveOptions: (
     linkExcludePatternFiles,
     reportUnusedPatterns,
     dryRun = reportUnusedPatterns === "only",
+    bottlenecks = {},
     ...rest
   } = mergedOptions;
 
@@ -101,6 +102,7 @@ export const mergeAndResolveOptions: (
 
   return {
     ...rest,
+    bottlenecks,
     reportUnusedPatterns,
     dryRun,
     linkIncludePatterns: patternsOrGlobstar(resolvedLinkIncludePatterns),

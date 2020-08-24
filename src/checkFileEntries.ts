@@ -7,7 +7,6 @@ import {
   FileChecksEntry,
   LinkCheck,
   CheckLinkOptions,
-  CheckLinkArgs,
 } from "./types";
 
 const getURL = (link: string, rootURL: string | URL) => {
@@ -24,10 +23,8 @@ const getURL = (link: string, rootURL: string | URL) => {
 export const checkFileEntry: (
   entry: FileContentEntry,
   options: CheckLinkOptions
-) => Promise<FileChecksEntry> = async (
-  { filePath, content },
-  { rootURL, linkIncludePatterns, linkExcludePatterns, dryRun }
-) => {
+) => Promise<FileChecksEntry> = async ({ filePath, content }, options) => {
+  const { rootURL } = options;
   const resolvedEntry = {
     filePath,
     content: await (typeof content === "function"
@@ -40,13 +37,13 @@ export const checkFileEntry: (
       async (link: string) => {
         const url = getURL(link, rootURL);
         if (!url) return null;
-        const check = await checkLink({
-          link,
-          url,
-          linkIncludePatterns,
-          linkExcludePatterns,
-          dryRun,
-        } as CheckLinkArgs);
+        const check = await checkLink(
+          {
+            link,
+            url,
+          },
+          options
+        );
         return check;
       }
     )
