@@ -46,7 +46,7 @@ jobs:
 
       - name: Run the link check script
         id: check
-        uses: "iterative/link-check.action@master"
+        uses: "iterative/link-check.action@v0.3.0"
         with:
           configFile: "./.linkcheckrc.json"
           rootURL: "${{ github.event.deployment.payload.web_url }}"
@@ -78,7 +78,7 @@ jobs:
 
     - name: Run the link check script
       id: check
-      uses: "iterative/link-check.action@master"
+      uses: "iterative/link-check.action@v0.3.0"
       with:
         configFile: "./.linkcheckrc.json"
         rootURL: "${{ github.event.deployment.payload.web_url }}"
