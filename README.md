@@ -152,6 +152,20 @@ those stopped by the dry run alone.
 If set to "only", applies dryRun and skips report logging after reporting unused patterns.
 If otherwise true, unused link exclusion patterns will be logged to output.
 
+### bottlenecks: Map<string, {minTime: number, maxConcurrent: number}
+
+This object determines overrides for the settings of the Bottleneck instances
+used for each hostname. The keys will be tried as a micromatch pattern against
+each link's hostname, and the object at the first match will have its keys
+override the defaults for that instance.
+
+By default, Bottleneck instances only allow one concurrent connection and at
+least 400ms minimum time between each call per hostname. Sites with more
+aggressive 429 responses may require a larger minTime, but the defaults handle
+the majority of sites well.
+
+This setting can only be defined in an options file.
+
 ## Runners
 
 ### CLI

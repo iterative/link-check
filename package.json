@@ -9,7 +9,7 @@
   "scripts": {
     "build": "cross-env webpack -c webpack/all.js",
     "lint": "cross-env eslint --cache --fix \"**/*.{js,ts}\"",
-    "format": "cross-env prettier --write \"**/*.{js,ts,json,yml}\"",
+    "format": "cross-env prettier --write \"**/*.{js,ts,json,yml,md}\"",
     "commit": "cd github-actions; git commit -a && cd ../; git commit -a"
   },
   "devDependencies": {
