@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "moduleResolution": "node",
     "outDir": "./dist/",
     "noImplicitAny": false,
     "module": "es6",
@@ -10,6 +11,6 @@
     "sourceMap": true,
     "allowJs": true
   },
-  "include": ["src/**/*.ts", ".eslintrc.js"],
+  "include": ["src/**/*.ts"],
   "exclude": ["node_modules"]
 }

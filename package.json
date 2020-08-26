@@ -8,40 +8,39 @@
   "private": false,
   "scripts": {
     "build": "cross-env webpack -c webpack/all.js",
-    "lint": "cross-env eslint --cache --fix \"**/*.{js,ts}\"",
-    "format": "cross-env prettier --write \"**/*.{js,ts,json,yml,md}\"",
-    "commit": "cd github-actions; git commit -a && cd ../; git commit -a"
+    "lint": "cross-env eslint --cache --fix '**/*.{js,ts}' && tsc --noEmit",
+    "format": "cross-env prettier --write '**/*.{js,ts,json,yml,md}'"
   },
   "devDependencies": {
-    "@actions/core": "^1.2.4",
-    "@babel/core": "^7.11.1",
+    "@actions/core": "^1.2.5",
+    "@babel/core": "^7.11.4",
     "@babel/preset-env": "^7.11.0",
     "@babel/preset-typescript": "^7.10.4",
-    "@types/lodash": "^4.14.159",
+    "@types/lodash": "^4.14.160",
     "@types/minimist": "^1.2.0",
     "@types/node-fetch": "^2.5.7",
-    "@typescript-eslint/eslint-plugin": "^3.6.1",
-    "@typescript-eslint/parser": "^3.9.0",
+    "@typescript-eslint/eslint-plugin": "^3.10.1",
+    "@typescript-eslint/parser": "^3.10.1",
     "babel-jest": "^26.2.2",
     "copy-webpack-plugin": "^6.0.3",
     "cross-env": "^7.0.2",
-    "eslint": "7.7.0",
+    "eslint": "^7.7.0",
     "eslint-config-airbnb-base": "14.2.0",
     "eslint-config-prettier": "^6.11.0",
     "eslint-plugin-import": "^2.21.2",
     "eslint-plugin-prettier": "^3.1.4",
     "husky": ">=4",
-    "jest": "^26.4.0",
-    "lint-staged": ">=10",
-    "prettier": "^2.0.5",
+    "jest": "^26.4.2",
+    "lint-staged": ">=10.2.13",
+    "prettier": "^2.1.1",
     "terser-webpack-plugin": "^4.1.0",
-    "ts-loader": "^8.0.2",
-    "typescript": "^3.9.7",
-    "webpack": "^5.0.0-beta.25",
+    "ts-loader": "^8.0.3",
+    "typescript": "^4.0.2",
+    "webpack": "^5.0.0-beta.28",
     "webpack-bundle-analyzer": "^3.0.0-beta.0",
     "webpack-cli": "^4.0.0-beta.8",
-    "webpack-merge": "^5.1.1",
-    "webpack-node-externals": "^2.5.1"
+    "webpack-merge": "^5.1.2",
+    "webpack-node-externals": "^2.5.2"
   },
   "dependencies": {
     "bottleneck": "^2.19.5",
@@ -50,6 +49,9 @@
     "micromatch": "^4.0.2",
     "minimist": "^1.2.5",
     "node-fetch": "^2.6.0"
+  },
+  "engines": {
+    "node": ">=12.0.0"
   },
   "files": [
     "dist/**/*"
