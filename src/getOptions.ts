@@ -109,5 +109,5 @@ export const mergeAndResolveOptions: (
     linkExcludePatterns: resolvedLinkExcludePatterns,
     fileIncludePatterns: patternsOrGlobstar(resolvedFileIncludePatterns),
     fileExcludePatterns: resolvedFileExcludePatterns,
-  };
+  } as CheckLinkOptions;
 };

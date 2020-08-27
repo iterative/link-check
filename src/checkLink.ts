@@ -101,7 +101,9 @@ const isMatch = (
 export const getUnusedLinkExcludePatterns = (
   allPatterns: string[]
 ): string[] => {
-  return allPatterns.filter((x: string) => !usedExcludePatterns.has(x));
+  return allPatterns
+    ? allPatterns.filter((x: string) => !usedExcludePatterns.has(x))
+    : [];
 };
 
 const checkLink: (

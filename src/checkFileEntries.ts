@@ -1,4 +1,4 @@
-import checkLink from "./checkLink";
+import checkLink, { getUnusedLinkExcludePatterns } from "./checkLink";
 import scrapeLinks from "./scrapeLinks";
 import asyncMap from "./async-map";
 
@@ -7,6 +7,7 @@ import {
   FileChecksEntry,
   LinkCheck,
   CheckLinkOptions,
+  ChecksReport,
 } from "./types";
 
 const getURL = (link: string, rootURL: string | URL) => {
@@ -54,14 +55,25 @@ export const checkFileEntry: (
   };
 };
 
-export const checkFileEntries: (
+export async function checkFileEntries(
   fileContentEntries: FileContentEntry[],
   options?: CheckLinkOptions
-) => Promise<FileChecksEntry[]> = async (fileContentEntries, options) => {
-  return (
-    await asyncMap<FileContentEntry, FileChecksEntry>(
-      fileContentEntries,
-      (entry: FileContentEntry) => checkFileEntry(entry, options)
-    )
-  ).filter((file) => file.checks.length > 0);
-};
+): Promise<ChecksReport> {
+  const entries = await asyncMap<FileContentEntry, FileChecksEntry>(
+    fileContentEntries,
+    (entry: FileContentEntry) => checkFileEntry(entry, options)
+  );
+  const [totalChecks, failedChecks] = entries.reduce(
+    ([totalCount, failedCount], { checks }) => [
+      totalCount + checks.length,
+      failedCount + checks.filter((check) => !check.pass).length,
+    ],
+    [0, 0]
+  );
+  return {
+    totalChecks,
+    failedChecks,
+    entries,
+    unusedPatterns: getUnusedLinkExcludePatterns(options.linkExcludePatterns),
+  } as ChecksReport;
+}

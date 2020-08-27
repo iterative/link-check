@@ -8,7 +8,6 @@ import formatEntries from "../formatEntries";
 import asyncMap from "../async-map";
 
 import { optionsFromFile, mergeAndResolveOptions } from "../getOptions";
-import { getUnusedLinkExcludePatterns } from "../checkLink";
 import { UnresolvedCheckLinkOptions, FileChecksEntry } from "../types";
 
 async function getInput(inputName: string): Promise<string | string[]> {
@@ -94,13 +93,13 @@ function reduceCheckEntriesToErrors(
   entries: FileChecksEntry[]
 ): FileChecksEntry[] {
   return entries.reduce((acc, { filePath, checks }) => {
-    const failedChecks = checks.filter((check) => !check.pass);
-    return failedChecks.length > 0
+    const failingEntries = checks.filter((check) => !check.pass);
+    return failingEntries.length > 0
       ? [
           ...acc,
           {
             filePath,
-            checks: failedChecks,
+            checks: failingEntries,
           },
         ]
       : acc;
@@ -119,49 +118,53 @@ async function main() {
   const summarySegments = [];
   const descriptionSegments = [];
 
-  const { reportUnusedPatterns, linkExcludePatterns } = options;
+  const { reportUnusedPatterns } = options;
 
   await gitFetchPromise;
 
   const fileEntries = await getContentEntries(options);
-  const checkEntries = await checkFileEntries(fileEntries, options);
+  const {
+    totalChecks,
+    failedChecks,
+    entries,
+    unusedPatterns,
+  } = await checkFileEntries(fileEntries, options);
 
-  if (checkEntries.length === 0) {
+  if (totalChecks === 0) {
     return conclude({
       summary: "There were no files to check links in.",
       success: true,
     });
   }
 
-  if (reportUnusedPatterns && linkExcludePatterns) {
-    const unusedLinkExcludePatterns = getUnusedLinkExcludePatterns(
-      linkExcludePatterns
-    );
-    const unusedPatternsExist = unusedLinkExcludePatterns.length > 1;
-    if (unusedPatternsExist) {
-      const patternLines = unusedLinkExcludePatterns
-        .map((pattern) => `  - ${pattern}`)
-        .join("\n\n");
-      summarySegments.push(`Some link patterns were unused`);
-      descriptionSegments.push(`# Unused match patterns\n\n${patternLines}`);
-    } else {
-      summarySegments.push(`All link patterns are used`);
-    }
+  if (failedChecks === 0) {
+    return conclude({
+      summary: "All links passed the check!",
+      success: true,
+    });
+  }
+
+  if (reportUnusedPatterns && unusedPatterns.length > 0) {
+    const patternLines = unusedPatterns
+      .map((pattern) => `  - ${pattern}`)
+      .join("\n\n");
+    summarySegments.push(`Some link patterns were unused`);
+    descriptionSegments.push(`# Unused match patterns\n\n${patternLines}`);
     if (reportUnusedPatterns === "only") {
       return conclude({
         summarySegments,
         descriptionSegments,
-        success: !unusedPatternsExist,
+        success: false,
       });
     }
   }
 
-  const failedChecks = reduceCheckEntriesToErrors(checkEntries);
-  const hasError = failedChecks.length > 0;
+  const hasError = failedChecks > 0;
   if (hasError) {
+    const failEntries = reduceCheckEntriesToErrors(entries);
     summarySegments.push("Some new links failed the check.");
     descriptionSegments.push(
-      `# Failed checks\n\n${formatEntries(failedChecks, {
+      `# Failed checks\n\n${formatEntries(failEntries, {
         fileFormat: ({ filePath }) => `* ${filePath}\n`,
         linkFormat: ({ link, href, description }) =>
           `  - ${link}${

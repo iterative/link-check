@@ -70,3 +70,10 @@ export interface BottleneckOptions {
   minTime: number;
   maxConcurrent: number;
 }
+
+export interface ChecksReport {
+  totalChecks: number;
+  failedChecks: number;
+  entries: FileChecksEntry[];
+  unusedPatterns: string[];
+}
