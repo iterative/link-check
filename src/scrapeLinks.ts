@@ -1,7 +1,19 @@
 import path from "path";
 
-const matchAllPluck = (input: string, regex: RegExp, pluck = (x) => x[1]) =>
-  Array.from(input.matchAll(regex), pluck);
+const regexMap = (
+  input: string,
+  regex: RegExp,
+  iteratee = (x: string[]) => x[1]
+): string[] => {
+  const results = [];
+  let match: string[] = regex.exec(input);
+  while (match !== null) {
+    const result = iteratee(match);
+    if (result) results.push(result);
+    match = regex.exec(input);
+  }
+  return results;
+};
 
 const scrapeFromString: (filePath: string, content: string) => string[] = (
   filePath,
@@ -10,7 +22,7 @@ const scrapeFromString: (filePath: string, content: string) => string[] = (
   switch (path.extname(filePath)) {
     case ".md":
     case ".mdx": {
-      const links = matchAllPluck(
+      const links = regexMap(
         content,
         /\[.*?\]\((?:<((?:\(.*?\)|.)*?)>|((?:\(.*?\)|.)*?))(?: ["'].*?["'])?\)/gm,
         (x) => x[2] || x[1]
@@ -22,12 +34,12 @@ const scrapeFromString: (filePath: string, content: string) => string[] = (
         : null;
     }
     case ".html":
-      return matchAllPluck(content, /href="(.*?)"/gm);
+      return regexMap(content, /href="(.*?)"/gm);
     case ".json":
-      return matchAllPluck(content, /"(?:(?:https?:)?\/\/)?(?:)"/gm);
+      return regexMap(content, /"(?:(?:https?:)?\/\/)?(?:)"/gm);
     default:
       // credit to https://urlregex.com/, but modified to only hit http/s protocol
-      return matchAllPluck(
+      return regexMap(
         content,
         /(((https?:\/\/)[A-Za-z0-9.-]+|(?:www\.)[A-Za-z0-9.-]+)((?:\/[+~%/.\w\-_]*)?\??(?:[-+=&;%@.\w_]*)#?(?:[.!/\\\w]*))?)/gm,
         (x) => x[0]
