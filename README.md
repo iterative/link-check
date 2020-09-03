@@ -172,6 +172,13 @@ This is a list of output strategies to use on the current run. Both runners can
 use "consoleLog" and "exitCode", and the GitHub Action has a third "checkAction"
 mode to output to GitHub Actions.
 
+### failsOnly: boolean
+
+When true, only log/report failed link checks. Useful to get around GitHub
+Actions' character limit.
+
+Disabled by default on CLI, enabled by default on GitHub Actions.
+
 ## Runners
 
 ### CLI
@@ -207,6 +214,8 @@ To specify multiple patterns or pattern files, use the relevant flag multiple ti
 ##### -u / --report-unused-patterns
 
 ##### -o / --output
+
+##### -f / --fails-only
 
 #### CLI-specific options
 
@@ -248,6 +257,8 @@ strings as the relevant option's input.
 ##### reportUnusedPatterns
 
 ##### output
+
+##### failsOnly
 
 ## Contributing
 
