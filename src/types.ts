@@ -23,7 +23,6 @@ interface CoreLinkCheckOptions {
   reportUnusedPatterns?: boolean | "only";
   dryRun?: boolean;
   verbose?: boolean;
-  alwaysExitZero?: boolean;
   bottlenecks?: Map<string, BottleneckOptions>;
   failOnUnusedPatterns?: boolean;
 }
