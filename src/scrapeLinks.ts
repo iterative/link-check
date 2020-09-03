@@ -22,11 +22,13 @@ const scrapeFromString: (filePath: string, content: string) => string[] = (
   switch (path.extname(filePath)) {
     case ".md":
     case ".mdx": {
-      const links = regexMap(
+      const mdLinks = regexMap(
         content,
         /\[.*?\]\((?:<((?:\(.*?\)|.)*?)>|((?:\(.*?\)|.)*?))(?: ["'].*?["'])?\)/gm,
         (x) => x[2] || x[1]
       );
+      const hrefLinks = regexMap(content, /href="(.*?)"/gm);
+      const links = mdLinks.concat(hrefLinks);
       return links
         ? links
             .filter(Boolean)
