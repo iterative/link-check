@@ -25,7 +25,6 @@ interface CoreLinkCheckOptions {
   verbose?: boolean;
   bottlenecks?: Map<string, BottleneckOptions>;
   failOnUnusedPatterns?: boolean;
-  failsOnly?: boolean;
 }
 
 export interface LinkCheckOptions extends CoreLinkCheckOptions {
@@ -34,6 +33,7 @@ export interface LinkCheckOptions extends CoreLinkCheckOptions {
   fileIncludePatterns?: string[];
   fileExcludePatterns?: string[];
   output?: string[];
+  failsOnly?: boolean;
 }
 
 export interface UnresolvedLinkCheckOptions extends CoreLinkCheckOptions {
@@ -46,6 +46,7 @@ export interface UnresolvedLinkCheckOptions extends CoreLinkCheckOptions {
   fileIncludePatternFiles?: string | string[];
   fileExcludePatternFiles?: string | string[];
   output?: string[] | string;
+  failsOnly?: boolean | "false";
 }
 
 export interface LinkCheckArgs {
