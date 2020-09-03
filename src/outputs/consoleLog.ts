@@ -1,22 +1,31 @@
 import { ChecksReport, LinkCheckOptions } from "../types";
 import formatEntries from "../formatEntries";
+import combineSegments from "./combineSegments";
 
 function conclude(outputSegments: string[]): void {
-  console.log(outputSegments.join("\n\n"));
+  console.log(combineSegments(outputSegments));
 }
 
 function consoleLogReporter(
   report: ChecksReport,
   options: LinkCheckOptions
 ): void {
-  const { reportUnusedPatterns } = options;
-  const { totalChecks, failedChecks, entries, unusedPatterns } = report;
+  const { reportUnusedPatterns, failsOnly } = options;
+  const {
+    totalChecksCount,
+    failedChecksCount,
+    entries,
+    failedEntries,
+    unusedPatterns,
+  } = report;
   const outputSegments = [];
 
-  if (totalChecks === 0) {
+  const outputEntries = failsOnly ? failedEntries : entries;
+
+  if (totalChecksCount === 0) {
     outputSegments.push("There were no links to check!");
   } else {
-    const reportBody = formatEntries(entries);
+    const reportBody = formatEntries(outputEntries);
 
     if (reportUnusedPatterns) {
       if (unusedPatterns.length > 0) {
@@ -33,10 +42,13 @@ function consoleLogReporter(
       }
     }
 
-    if (failedChecks > 0) {
-      outputSegments.push(`${reportBody}\n\n${failedChecks} links failed.`);
+    outputSegments.push(reportBody);
+    if (failedChecksCount > 0) {
+      outputSegments.push(
+        `${failedChecksCount}/${totalChecksCount} links failed.`
+      );
     } else {
-      outputSegments.push(`${reportBody}\n\nAll links passed!`);
+      outputSegments.push(`All ${totalChecksCount} links passed!`);
     }
   }
 

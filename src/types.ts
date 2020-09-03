@@ -25,6 +25,7 @@ interface CoreLinkCheckOptions {
   verbose?: boolean;
   bottlenecks?: Map<string, BottleneckOptions>;
   failOnUnusedPatterns?: boolean;
+  failsOnly?: boolean;
 }
 
 export interface LinkCheckOptions extends CoreLinkCheckOptions {
@@ -65,8 +66,9 @@ export interface BottleneckOptions {
 }
 
 export interface ChecksReport {
-  totalChecks: number;
-  failedChecks: number;
   entries: FileChecksEntry[];
+  totalChecksCount: number;
+  failedEntries: FileChecksEntry[];
+  failedChecksCount: number;
   unusedPatterns: string[];
 }

@@ -63,17 +63,36 @@ export async function checkFileEntries(
     fileContentEntries,
     (entry: FileContentEntry) => checkFileEntry(entry, options)
   );
-  const [totalChecks, failedChecks] = entries.reduce(
-    ([totalCount, failedCount], { checks }) => [
-      totalCount + checks.length,
-      failedCount + checks.filter((check) => !check.pass).length,
-    ],
-    [0, 0]
+
+  // Collect total count, failed count, and filtered failed entries in one pass of the dataset
+  const [totalChecksCount, failedChecksCount, failedEntries] = entries.reduce(
+    (
+      [totalChecksCountAcc, totalFailedChecksCountAcc, failedEntriesAcc],
+      { filePath, checks }
+    ) => {
+      const currentFailedChecks = checks.filter((check) => !check.pass);
+      return [
+        totalChecksCountAcc + checks.length,
+        totalFailedChecksCountAcc + currentFailedChecks.length,
+        currentFailedChecks.length > 0
+          ? [
+              ...failedEntriesAcc,
+              {
+                filePath,
+                checks: currentFailedChecks,
+              },
+            ]
+          : failedEntriesAcc,
+      ];
+    },
+    [0, 0, []]
   );
+
   return {
-    totalChecks,
-    failedChecks,
     entries,
+    failedEntries,
+    totalChecksCount,
+    failedChecksCount,
     unusedPatterns: getUnusedLinkExcludePatterns(options.linkExcludePatterns),
   } as ChecksReport;
 }

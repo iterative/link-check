@@ -24,6 +24,7 @@ const optionsFromFlags: () => Promise<LinkCheckOptions> = async () => {
     "link-exclude-pattern-file": linkExcludePatternFiles,
     "report-unused-patterns": reportUnusedPatterns,
     "dry-run": dryRun = reportUnusedPatterns === "only",
+    "fails-only": failsOnly = false,
     verbose,
     output = ["consoleLog"],
   } = minimist(process.argv.slice(2), {
@@ -43,6 +44,7 @@ const optionsFromFlags: () => Promise<LinkCheckOptions> = async () => {
       fef: "file-exclude-pattern-file",
       v: "verbose",
       o: "output",
+      f: "fails-only",
     },
   });
 
@@ -61,6 +63,7 @@ const optionsFromFlags: () => Promise<LinkCheckOptions> = async () => {
     verbose,
     dryRun,
     output,
+    failsOnly,
   };
 
   const fileOptions = await optionsFromFile(config);

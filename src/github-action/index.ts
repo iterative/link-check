@@ -29,6 +29,7 @@ async function optionsFromCoreInputs() {
   const {
     configFile,
     output = ["consoleLog", "exitCode"],
+    failsOnly = true,
     ...inputOptions
   }: UnresolvedLinkCheckOptions & {
     configFile?: string;
@@ -50,6 +51,7 @@ async function optionsFromCoreInputs() {
       "fileExcludePatternFiles",
       "fileExcludePatterns",
       "output",
+      "failsOnly",
     ].reduce((acc, name) => {
       const value = getInput(name);
       return value === "" ? acc : [...acc, [name, value]];
@@ -60,6 +62,7 @@ async function optionsFromCoreInputs() {
     {
       ...inputOptions,
       output,
+      failsOnly,
     },
     await optionsFromFile(configFile),
   ]);

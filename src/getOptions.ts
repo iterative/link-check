@@ -84,6 +84,7 @@ export async function mergeAndResolveOptions(
     linkExcludePatternFiles,
     reportUnusedPatterns,
     dryRun = reportUnusedPatterns === "only",
+    failOnUnusedPatterns = reportUnusedPatterns === "only",
     bottlenecks = {},
     output,
     ...rest
@@ -107,6 +108,7 @@ export async function mergeAndResolveOptions(
     reportUnusedPatterns,
     dryRun,
     output: output && (Array.isArray(output) ? output : [output]),
+    failOnUnusedPatterns,
     linkIncludePatterns: patternsOrGlobstar(resolvedLinkIncludePatterns),
     linkExcludePatterns: resolvedLinkExcludePatterns,
     fileIncludePatterns: patternsOrGlobstar(resolvedFileIncludePatterns),
