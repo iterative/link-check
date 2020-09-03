@@ -32,29 +32,29 @@ async function optionsFromCoreInputs() {
     ...inputOptions
   }: UnresolvedLinkCheckOptions & {
     configFile?: string;
-  } = [
-    "source",
-    "configFile",
-    "rootURL",
-    "dryRun",
-    "reportUnusedPatterns",
+  } = Object.fromEntries(
+    [
+      "source",
+      "configFile",
+      "rootURL",
+      "dryRun",
+      "reportUnusedPatterns",
 
-    "linkIncludePatternFiles",
-    "linkIncludePatterns",
-    "linkExcludePatternFiles",
-    "linkExcludePatterns",
+      "linkIncludePatternFiles",
+      "linkIncludePatterns",
+      "linkExcludePatternFiles",
+      "linkExcludePatterns",
 
-    "fileIncludePatternFiles",
-    "fileIncludePatterns",
-    "fileExcludePatternFiles",
-    "fileExcludePatterns",
-    "output",
-  ]
-    .map((name) => [name, getInput(name)])
-    .reduce((acc, [k, v]) => {
-      if (v !== "") acc[k] = v;
-      return acc;
-    }, {}) as UnresolvedLinkCheckOptions;
+      "fileIncludePatternFiles",
+      "fileIncludePatterns",
+      "fileExcludePatternFiles",
+      "fileExcludePatterns",
+      "output",
+    ].reduce((acc, name) => {
+      const value = getInput(name);
+      return value === "" ? acc : [...acc, [name, value]];
+    }, [])
+  ) as UnresolvedLinkCheckOptions;
 
   return mergeAndResolveOptions([
     {
