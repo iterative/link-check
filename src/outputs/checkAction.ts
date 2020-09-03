@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
 // eslint-disable-next-line import/no-extraneous-dependencies
-import core from "@actions/core";
+import * as core from "@actions/core";
 import { ChecksReport, LinkCheckOptions, FileChecksEntry } from "../types";
 import formatEntries from "../formatEntries";
 

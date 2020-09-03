@@ -3,7 +3,6 @@ import * as core from "@actions/core";
 import { exec } from "child_process";
 import getContentEntries from "../inputs";
 import { checkFileEntries } from "../checkFileEntries";
-import asyncMap from "../async-map";
 import useOutputs from "../outputs/useOutputs";
 import consoleLogOutput from "../outputs/consoleLog";
 import exitCodeOutput from "../outputs/exitCode";
@@ -14,8 +13,8 @@ import { UnresolvedLinkCheckOptions } from "../types";
 
 const availableOutputs = [checkActionOutput, consoleLogOutput, exitCodeOutput];
 
-async function getInput(inputName: string): Promise<string | string[]> {
-  const input = await core.getInput(inputName);
+function getInput(inputName: string): string | string[] {
+  const input = core.getInput(inputName);
   try {
     return JSON.parse(input);
   } catch (e) {
@@ -33,32 +32,29 @@ async function optionsFromCoreInputs() {
     ...inputOptions
   }: UnresolvedLinkCheckOptions & {
     configFile?: string;
-  } = (
-    await asyncMap<string, [string, string | string[] | boolean | undefined]>(
-      [
-        "source",
-        "configFile",
-        "rootURL",
-        "dryRun",
-        "reportUnusedPatterns",
+  } = [
+    "source",
+    "configFile",
+    "rootURL",
+    "dryRun",
+    "reportUnusedPatterns",
 
-        "linkIncludePatternFiles",
-        "linkIncludePatterns",
-        "linkExcludePatternFiles",
-        "linkExcludePatterns",
+    "linkIncludePatternFiles",
+    "linkIncludePatterns",
+    "linkExcludePatternFiles",
+    "linkExcludePatterns",
 
-        "fileIncludePatternFiles",
-        "fileIncludePatterns",
-        "fileExcludePatternFiles",
-        "fileExcludePatterns",
-        "output",
-      ],
-      async (name) => [name, await getInput(name)]
-    )
-  ).reduce((acc, [k, v]) => {
-    if (v !== "") acc[k] = v;
-    return acc;
-  }, {}) as UnresolvedLinkCheckOptions;
+    "fileIncludePatternFiles",
+    "fileIncludePatterns",
+    "fileExcludePatternFiles",
+    "fileExcludePatterns",
+    "output",
+  ]
+    .map((name) => [name, getInput(name)])
+    .reduce((acc, [k, v]) => {
+      if (v !== "") acc[k] = v;
+      return acc;
+    }, {}) as UnresolvedLinkCheckOptions;
 
   return mergeAndResolveOptions([
     {
