@@ -1,11 +1,11 @@
 import glob from "fast-glob";
 import fs from "fs";
-import { FileContentEntry, CheckLinkOptions } from "../types";
+import { FileContentEntry, LinkCheckOptions } from "../types";
 
 async function contentFromFilesystem({
   fileIncludePatterns,
   fileExcludePatterns,
-}: CheckLinkOptions): Promise<FileContentEntry[]> {
+}: LinkCheckOptions): Promise<FileContentEntry[]> {
   const filePaths = await glob(fileIncludePatterns, {
     ignore: fileExcludePatterns,
   });

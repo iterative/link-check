@@ -1,6 +1,6 @@
 import { exec } from "child_process";
 import mm from "micromatch";
-import { FileContentEntry, CheckLinkOptions } from "../types";
+import { FileContentEntry, LinkCheckOptions } from "../types";
 
 const getGitDiffPatchText: () => Promise<string> = async () =>
   new Promise((resolve, reject) => {
@@ -10,7 +10,7 @@ const getGitDiffPatchText: () => Promise<string> = async () =>
   });
 
 const getFileContentEntries: (
-  options: CheckLinkOptions
+  options: LinkCheckOptions
 ) => Promise<FileContentEntry[]> = async ({
   fileIncludePatterns,
   fileExcludePatterns,

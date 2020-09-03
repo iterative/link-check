@@ -14,10 +14,10 @@ export interface FileContentEntry extends FileEntry {
 }
 
 export interface FileChecksEntry extends FileEntry {
-  checks: LinkCheck[];
+  checks: CheckedLink[];
 }
 
-interface CoreCheckLinkOptions {
+interface CoreLinkCheckOptions {
   source?: string;
   rootURL?: string;
   reportUnusedPatterns?: boolean | "only";
@@ -25,16 +25,18 @@ interface CoreCheckLinkOptions {
   verbose?: boolean;
   alwaysExitZero?: boolean;
   bottlenecks?: Map<string, BottleneckOptions>;
+  failOnUnusedPatterns?: boolean;
 }
 
-export interface CheckLinkOptions extends CoreCheckLinkOptions {
+export interface LinkCheckOptions extends CoreLinkCheckOptions {
   linkIncludePatterns?: string[];
   linkExcludePatterns?: string[];
   fileIncludePatterns?: string[];
   fileExcludePatterns?: string[];
+  output?: string[];
 }
 
-export interface UnresolvedCheckLinkOptions extends CoreCheckLinkOptions {
+export interface UnresolvedLinkCheckOptions extends CoreLinkCheckOptions {
   linkIncludePatterns?: string | string[];
   linkExcludePatterns?: string | string[];
   fileIncludePatterns?: string | string[];
@@ -43,27 +45,19 @@ export interface UnresolvedCheckLinkOptions extends CoreCheckLinkOptions {
   linkExcludePatternFiles?: string | string[];
   fileIncludePatternFiles?: string | string[];
   fileExcludePatternFiles?: string | string[];
+  output?: string[] | string;
 }
 
-export interface CheckLinkArgs {
+export interface LinkCheckArgs {
   link: string;
   url: URL;
 }
 
-export interface LinkCheck {
+export interface CheckedLink {
   link: string;
   pass: boolean;
   description?: string;
   href?: string;
-}
-
-export interface OnCheckAPI {
-  link: string;
-  url: URL;
-}
-
-export interface AfterCheckAPI extends OnCheckAPI {
-  check: LinkCheck;
 }
 
 export interface BottleneckOptions {

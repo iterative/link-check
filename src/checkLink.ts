@@ -2,14 +2,14 @@ import fetch from "node-fetch";
 import mm from "micromatch";
 import Bottleneck from "bottleneck";
 import {
-  CheckLinkArgs,
-  CheckLinkOptions,
-  LinkCheck,
+  LinkCheckArgs,
+  LinkCheckOptions,
+  CheckedLink,
   BottleneckOptions,
 } from "./types";
 
 const hostBottlenecks = {};
-const getBottleneck = (hostname: string, options: CheckLinkOptions) => {
+const getBottleneck = (hostname: string, options: LinkCheckOptions) => {
   if (!hostBottlenecks[hostname]) {
     const bottleneckOverrideEntry = Object.entries(
       options.bottlenecks
@@ -28,7 +28,7 @@ const getBottleneck = (hostname: string, options: CheckLinkOptions) => {
 const bottleneckedFetch: (
   url: URL,
   fetchOptions: { method: string },
-  options: CheckLinkOptions
+  options: LinkCheckOptions
 ) => Promise<Response> = async (url, fetchOptions, options) =>
   getBottleneck(url.hostname, options).schedule(() =>
     fetch(url.href, fetchOptions)
@@ -37,7 +37,7 @@ const bottleneckedFetch: (
 const fetchWithRetries = async (
   url: URL,
   fetchOptions = {},
-  options: CheckLinkOptions
+  options: LinkCheckOptions
 ) => {
   const res = await bottleneckedFetch(
     url,
@@ -62,7 +62,7 @@ const fetchWithRetries = async (
 };
 
 const memo = {};
-const memoizedFetch = async (url: URL, options: CheckLinkOptions) => {
+const memoizedFetch = async (url: URL, options: LinkCheckOptions) => {
   const { href } = url;
   const existing = memo[href];
   if (existing) {
@@ -107,9 +107,9 @@ export const getUnusedLinkExcludePatterns = (
 };
 
 const checkLink: (
-  linkDef: CheckLinkArgs,
-  options: CheckLinkOptions
-) => Promise<LinkCheck> = async ({ link, url }, options) => {
+  linkDef: LinkCheckArgs,
+  options: LinkCheckOptions
+) => Promise<CheckedLink> = async ({ link, url }, options) => {
   const { linkIncludePatterns, linkExcludePatterns, dryRun } = options;
   if (
     isMatch(link, linkIncludePatterns, {

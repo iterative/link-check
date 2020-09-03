@@ -1,9 +1,9 @@
-import { CheckLinkOptions, FileContentEntry } from "../types";
+import { LinkCheckOptions, FileContentEntry } from "../types";
 import contentFromGitDiff from "./git-diff";
 import contentFromFilesystem from "./filesystem";
 
 async function getContentEntries(
-  options: CheckLinkOptions
+  options: LinkCheckOptions
 ): Promise<FileContentEntry[]> {
   const { source } = options;
   switch (source) {

@@ -1,7 +1,7 @@
 import defaults from "lodash/defaults";
 import fs from "fs";
 import path from "path";
-import { UnresolvedCheckLinkOptions, CheckLinkOptions } from "./types";
+import { UnresolvedLinkCheckOptions, LinkCheckOptions } from "./types";
 import asyncMap from "./async-map";
 
 const patternsOrGlobstar = (
@@ -58,7 +58,7 @@ export default async function patternsFromFiles(
 
 export const optionsFromFile: (
   filePath: string | undefined
-) => Promise<UnresolvedCheckLinkOptions> = async (filePath) => {
+) => Promise<UnresolvedLinkCheckOptions> = async (filePath) => {
   if (!filePath) return {};
   const fileOptions = JSON.parse(
     String(fs.readFileSync(path.join(process.cwd(), filePath)))
@@ -66,10 +66,10 @@ export const optionsFromFile: (
   return fileOptions;
 };
 
-export const mergeAndResolveOptions: (
-  configs: Array<UnresolvedCheckLinkOptions>
-) => Promise<CheckLinkOptions> = async (configs) => {
-  const mergedOptions: UnresolvedCheckLinkOptions = defaults(
+export async function mergeAndResolveOptions(
+  configs: Array<UnresolvedLinkCheckOptions>
+): Promise<LinkCheckOptions> {
+  const mergedOptions: UnresolvedLinkCheckOptions = defaults(
     {},
     ...configs.filter(Boolean)
   );
@@ -85,6 +85,7 @@ export const mergeAndResolveOptions: (
     reportUnusedPatterns,
     dryRun = reportUnusedPatterns === "only",
     bottlenecks = {},
+    output,
     ...rest
   } = mergedOptions;
 
@@ -100,14 +101,15 @@ export const mergeAndResolveOptions: (
     [fileExcludePatternFiles, fileExcludePatterns],
   ]);
 
-  return {
+  return ({
     ...rest,
     bottlenecks,
     reportUnusedPatterns,
     dryRun,
+    output: output && (Array.isArray(output) ? output : [output]),
     linkIncludePatterns: patternsOrGlobstar(resolvedLinkIncludePatterns),
     linkExcludePatterns: resolvedLinkExcludePatterns,
     fileIncludePatterns: patternsOrGlobstar(resolvedFileIncludePatterns),
     fileExcludePatterns: resolvedFileExcludePatterns,
-  } as CheckLinkOptions;
-};
+  } as unknown) as LinkCheckOptions;
+}

@@ -1,11 +1,15 @@
 import minimist from "minimist";
-import formatEntries from "./formatEntries";
 import { checkFileEntries } from "./checkFileEntries";
 import { optionsFromFile, mergeAndResolveOptions } from "./getOptions";
-import { CheckLinkOptions } from "./types";
-import getContentEntries from "./contentFrom/index";
+import { LinkCheckOptions } from "./types";
+import getContentEntries from "./inputs/index";
+import useOutputs from "./outputs/useOutputs";
+import consoleOutput from "./outputs/consoleLog";
+import exitCodeOutput from "./outputs/exitCode";
 
-const optionsFromFlags: () => Promise<CheckLinkOptions> = async () => {
+const availableOutputs = [consoleOutput, exitCodeOutput];
+
+const optionsFromFlags: () => Promise<LinkCheckOptions> = async () => {
   const {
     config,
     source = "git-diff",
@@ -20,8 +24,9 @@ const optionsFromFlags: () => Promise<CheckLinkOptions> = async () => {
     "link-exclude-pattern-file": linkExcludePatternFiles,
     "always-exit-zero": alwaysExitZero,
     "report-unused-patterns": reportUnusedPatterns,
-    verbose,
     "dry-run": dryRun = reportUnusedPatterns === "only",
+    verbose,
+    output = ["consoleLog"],
   } = minimist(process.argv.slice(2), {
     alias: {
       c: "config",
@@ -39,6 +44,7 @@ const optionsFromFlags: () => Promise<CheckLinkOptions> = async () => {
       fif: "file-include-pattern-file",
       fef: "file-exclude-pattern-file",
       v: "verbose",
+      o: "output",
     },
   });
 
@@ -57,6 +63,7 @@ const optionsFromFlags: () => Promise<CheckLinkOptions> = async () => {
     reportUnusedPatterns,
     verbose,
     dryRun,
+    output,
   };
 
   const fileOptions = await optionsFromFile(config);
@@ -65,57 +72,11 @@ const optionsFromFlags: () => Promise<CheckLinkOptions> = async () => {
 };
 
 async function main() {
-  const outputSegments = [];
-  const checkLinkOptions = await optionsFromFlags();
-  let exitCode = 0;
-
-  const { alwaysExitZero, reportUnusedPatterns, verbose } = checkLinkOptions;
-
-  if (verbose) console.log("Options:", checkLinkOptions);
-
-  function conclude() {
-    console.log(outputSegments.join("\n\n"));
-    process.exit(alwaysExitZero ? 0 : exitCode);
-  }
-
-  const fileEntries = await getContentEntries(checkLinkOptions);
-
-  const {
-    totalChecks,
-    failedChecks,
-    entries,
-    unusedPatterns,
-  } = await checkFileEntries(fileEntries, checkLinkOptions);
-
-  if (totalChecks === 0) {
-    outputSegments.push("There were no links to check!");
-  } else {
-    const reportBody = formatEntries(entries);
-
-    if (reportUnusedPatterns) {
-      if (unusedPatterns.length > 0) {
-        outputSegments.push(
-          `Some link ignore patterns were unused!\n\n${unusedPatterns.join(
-            "\n"
-          )}\n`
-        );
-      } else {
-        outputSegments.push("All link patterns were used.");
-      }
-      if (reportUnusedPatterns === "only") {
-        conclude();
-      }
-    }
-
-    if (failedChecks > 0) {
-      outputSegments.push(`${reportBody}\n\n${failedChecks} links failed.`);
-      if (!alwaysExitZero) exitCode = 2;
-    } else {
-      outputSegments.push(`${reportBody}\n\nAll links passed!`);
-    }
-  }
-
-  conclude();
+  const options = await optionsFromFlags();
+  if (options.verbose) console.log("Options:", options);
+  const fileEntries = await getContentEntries(options);
+  const report = await checkFileEntries(fileEntries, options);
+  useOutputs(availableOutputs, options, report);
 }
 
 main();

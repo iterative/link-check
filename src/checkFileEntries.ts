@@ -5,8 +5,8 @@ import asyncMap from "./async-map";
 import {
   FileContentEntry,
   FileChecksEntry,
-  LinkCheck,
-  CheckLinkOptions,
+  CheckedLink,
+  LinkCheckOptions,
   ChecksReport,
 } from "./types";
 
@@ -23,7 +23,7 @@ const getURL = (link: string, rootURL: string | URL) => {
 
 export const checkFileEntry: (
   entry: FileContentEntry,
-  options: CheckLinkOptions
+  options: LinkCheckOptions
 ) => Promise<FileChecksEntry> = async ({ filePath, content }, options) => {
   const { rootURL } = options;
   const resolvedEntry = {
@@ -33,7 +33,7 @@ export const checkFileEntry: (
       : content),
   };
   const checks = (
-    await asyncMap<string, LinkCheck>(
+    await asyncMap<string, CheckedLink>(
       scrapeLinks(resolvedEntry),
       async (link: string) => {
         const url = getURL(link, rootURL);
@@ -57,7 +57,7 @@ export const checkFileEntry: (
 
 export async function checkFileEntries(
   fileContentEntries: FileContentEntry[],
-  options?: CheckLinkOptions
+  options?: LinkCheckOptions
 ): Promise<ChecksReport> {
   const entries = await asyncMap<FileContentEntry, FileChecksEntry>(
     fileContentEntries,

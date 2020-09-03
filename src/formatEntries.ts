@@ -1,4 +1,4 @@
-import { LinkCheck, FileChecksEntry } from "./types";
+import { CheckedLink, FileChecksEntry } from "./types";
 
 interface FormatterOptions {
   entryFormat?: (
@@ -8,14 +8,14 @@ interface FormatterOptions {
   ) => string;
   entrySeparator?: string;
   fileFormat?: (fileEntry: FileChecksEntry) => string;
-  linkFormat?: (check: LinkCheck) => string;
+  linkFormat?: (check: CheckedLink) => string;
   linkSeparator?: string;
 }
 
 const defaultFileFormat = ({ checks, filePath }) =>
   `* ${checks.some((check) => !check.pass) ? "FAIL" : "PASS"}: ${filePath}\n`;
 
-const defaultLinkFormat = ({ link, href, description, pass }: LinkCheck) =>
+const defaultLinkFormat = ({ link, href, description, pass }: CheckedLink) =>
   `  - ${pass ? "PASS" : "FAIL"}: ${link}${
     href ? ` = ${href}` : ""
   } (${description})`;
