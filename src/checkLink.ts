@@ -136,18 +136,24 @@ const checkLink: (
         pass: ok,
       };
     } catch (e) {
-      return {
+      const checkedLink: Partial<CheckedLink> = {
         link,
         href,
-        description: [
-          "Error",
-          e.code && ` ${e.code}`,
-          e.message && `: ${e.message}`,
-        ]
-          .filter(Boolean)
-          .join(""),
         pass: false,
       };
+      switch (e.code) {
+        case "ENOTFOUND":
+          checkedLink.description = "Site not found";
+          break;
+        default:
+          checkedLink.description = [
+            e.code || "Fetch Error",
+            e.message && `: ${e.message}`,
+          ]
+            .filter(Boolean)
+            .join("");
+      }
+      return checkedLink as CheckedLink;
     }
   } else {
     return {
