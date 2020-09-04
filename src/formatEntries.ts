@@ -1,26 +1,37 @@
 import { CheckedLink, FileChecksEntry } from "./types";
 
-interface FormatterOptions {
-  entryFormat?: (
-    entry: FileChecksEntry,
-    options?: FormatterOptions,
-    index?: number
-  ) => string;
+interface EntryFormatter {
+  (entry: FileChecksEntry, options?: FormatterOptions, index?: number): string;
+}
+
+interface FileFormatter {
+  (fileEntry: FileChecksEntry): string;
+}
+
+interface LinkFormatter {
+  (check: CheckedLink): string;
+}
+
+interface DefaultEntryFormatterOptions {
+  fileFormat?: FileFormatter;
+  linkFormat?: LinkFormatter;
   entrySeparator?: string;
-  fileFormat?: (fileEntry: FileChecksEntry) => string;
-  linkFormat?: (check: CheckedLink) => string;
   linkSeparator?: string;
 }
 
-const defaultFileFormat = ({ checks, filePath }) =>
-  `* ${checks.some((check) => !check.pass) ? "FAIL" : "PASS"}: ${filePath}\n`;
+interface FormatterOptions extends DefaultEntryFormatterOptions {
+  entryFormat?: EntryFormatter;
+  failsOnly?: boolean;
+}
+
+const defaultFileFormat = ({ filePath }) => `* ${filePath}\n`;
 
 const defaultLinkFormat = ({ link, href, description, pass }: CheckedLink) =>
   `  - ${pass ? "PASS" : "FAIL"}: ${link}${
     href ? ` = ${href}` : ""
   } (${description})`;
 
-const defaultEntryFormat = (
+const defaultEntryFormat: EntryFormatter = (
   { filePath, checks },
   {
     fileFormat = defaultFileFormat,
@@ -30,20 +41,26 @@ const defaultEntryFormat = (
 ) =>
   checks.length > 0
     ? fileFormat({ filePath, checks }) +
-      checks
-        .sort((a, b) => {
-          if (a.pass === b.pass) return 0;
-          return a.pass ? 1 : -1;
-        })
-        .map(linkFormat)
-        .join(linkSeparator)
+      checks.map(linkFormat).join(linkSeparator)
     : null;
+
+// An alternate default formatter for failsOnly, where showing "FAIL" is redundant
+const noResultEntryFormat: EntryFormatter = (args, options) =>
+  defaultEntryFormat(args, {
+    linkFormat: ({ link, href, description }) =>
+      `  - ${link}${href ? ` = ${href}` : ""} (${description})`,
+    fileFormat: ({ filePath }) => `* ${filePath}\n`,
+    ...options,
+  });
 
 const formatFileEntries: (
   fileCheckEntries: FileChecksEntry[],
   options?: FormatterOptions
 ) => string = (fileCheckEntries, options = {}) => {
-  const { entryFormat = defaultEntryFormat, entrySeparator = "\n\n" } = options;
+  const {
+    entryFormat = options.failsOnly ? noResultEntryFormat : defaultEntryFormat,
+    entrySeparator = "\n\n",
+  } = options;
   return fileCheckEntries
     .map((entry, i) => entryFormat(entry, options, i))
     .filter(Boolean)

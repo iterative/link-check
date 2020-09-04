@@ -25,14 +25,14 @@ function consoleLogReporter(
   if (totalChecksCount === 0) {
     outputSegments.push("There were no links to check!");
   } else {
-    const reportBody = formatEntries(outputEntries);
+    const reportBody = formatEntries(outputEntries, { failsOnly });
 
     if (reportUnusedPatterns) {
       if (unusedPatterns.length > 0) {
         outputSegments.push(
           `Some link ignore patterns were unused!\n\n${unusedPatterns.join(
             "\n"
-          )}\n`
+          )}`
         );
       } else {
         outputSegments.push("All link patterns were used.");
