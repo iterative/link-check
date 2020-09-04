@@ -31,6 +31,8 @@ function conclude({
   core.setOutput("output", JSON.stringify(output));
 }
 
+const fileFormat = ({ filePath }) => `* ${filePath}\n`;
+
 const linkFormatWithStatus = ({ link, href, description, pass }) =>
   `  - ${pass ? ":heavy_check_mark:" : ":x:"} ${link}${
     href && href !== link ? ` = ${href}` : ""
@@ -38,8 +40,6 @@ const linkFormatWithStatus = ({ link, href, description, pass }) =>
 
 const linkFormatWithoutStatus = ({ link, href, description }) =>
   `  - ${link}${href && href !== link ? ` = ${href}` : ""} (${description})`;
-
-const fileFormat = ({ filePath }) => `* ${filePath}\n`;
 
 function checkActionReporter(
   {
@@ -54,7 +54,10 @@ function checkActionReporter(
   const summarySegments = [];
   const descriptionSegments = [];
   const outputEntries = failsOnly ? failedEntries : entries;
-  const linkFormat = failsOnly ? linkFormatWithoutStatus : linkFormatWithStatus;
+  const formatterOptions = {
+    fileFormat,
+    linkFormat: failsOnly ? linkFormatWithoutStatus : linkFormatWithStatus,
+  };
 
   if (totalChecksCount === 0) {
     return conclude({
@@ -94,14 +97,14 @@ function checkActionReporter(
     summarySegments.push("Some new links failed the check.");
     descriptionSegments.push(
       checksHeading,
-      formatEntries(outputEntries, { linkFormat, fileFormat })
+      formatEntries(outputEntries, formatterOptions)
     );
   } else {
     summarySegments.push("All new links passed the check!");
     if (!failsOnly)
       descriptionSegments.push(
         checksHeading,
-        formatEntries(outputEntries, { linkFormat, fileFormat })
+        formatEntries(outputEntries, formatterOptions)
       );
   }
 
