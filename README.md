@@ -210,6 +210,11 @@ Actions' character limit.
 
 Disabled by default on CLI, enabled by default on GitHub Actions.
 
+### verbose: boolean
+
+When true, the application will `console.log` the parsed options object before
+running.
+
 ## Runners
 
 ### CLI
@@ -247,8 +252,6 @@ To specify multiple patterns or pattern files, use the relevant flag multiple ti
 ##### -o / --output
 
 ##### -f / --fails-only
-
-#### CLI-specific options
 
 ##### -v / --verbose
 

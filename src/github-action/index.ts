@@ -25,44 +25,56 @@ function getInput(inputName: string): string | string[] {
   }
 }
 
+function parseStringValue(value) {
+  switch (value) {
+    case "":
+      return undefined;
+    case "false":
+      return false;
+    default:
+      return value;
+  }
+}
+
 async function optionsFromCoreInputs() {
   const {
     configFile,
     output = ["consoleLog", "exitCode"],
     failsOnly,
+    verbose = false,
     ...inputOptions
   }: UnresolvedLinkCheckOptions & {
     configFile?: string;
-  } = Object.fromEntries(
-    [
-      "source",
-      "configFile",
-      "rootURL",
-      "dryRun",
-      "reportUnusedPatterns",
+  } = [
+    "source",
+    "configFile",
+    "rootURL",
+    "dryRun",
+    "reportUnusedPatterns",
 
-      "linkIncludePatternFiles",
-      "linkIncludePatterns",
-      "linkExcludePatternFiles",
-      "linkExcludePatterns",
+    "linkIncludePatternFiles",
+    "linkIncludePatterns",
+    "linkExcludePatternFiles",
+    "linkExcludePatterns",
 
-      "fileIncludePatternFiles",
-      "fileIncludePatterns",
-      "fileExcludePatternFiles",
-      "fileExcludePatterns",
-      "output",
-      "failsOnly",
-    ].reduce((acc, name) => {
-      const value = getInput(name);
-      return value === "" ? acc : [...acc, [name, value]];
-    }, [])
-  ) as UnresolvedLinkCheckOptions;
+    "fileIncludePatternFiles",
+    "fileIncludePatterns",
+    "fileExcludePatternFiles",
+    "fileExcludePatterns",
+    "output",
+    "failsOnly",
+    "verbose",
+  ].reduce((acc, name) => {
+    const value = parseStringValue(getInput(name));
+    return value === undefined ? acc : { ...acc, [name]: value };
+  }, {}) as UnresolvedLinkCheckOptions;
 
   return mergeAndResolveOptions([
     {
       ...inputOptions,
       output,
-      failsOnly: failsOnly !== "false",
+      failsOnly,
+      verbose,
     },
     await optionsFromFile(configFile),
   ]);
@@ -75,7 +87,7 @@ async function main() {
 
   const options = await optionsFromCoreInputs();
 
-  console.log("Options:", options);
+  if (options.verbose) console.log("Options:", options);
 
   await gitFetchPromise;
 
