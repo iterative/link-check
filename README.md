@@ -27,17 +27,42 @@ This setup checks all files in the project-relative directory `/content` with `.
 
 ### GitHub Action
 
-The Link Check can be run in a few different configurations, depending on what you'd like to check for.
+The Link Check can be run in a few different configurations to set when to check, and what to check for.
 
-For example, this workflow checks the links against successful PR deploy:
+For example, these two workflows work together to generate a GitHub Check with checked links when a deployment finishes:
+
+#### Check new links against each successful deployment
 
 ```yaml
+# .github/workflows/link-check-init.yml
+
+name: Link Check Deploy
+on: deployment
+
+jobs:
+  run:
+    name: Initialize
+    runs-on: ubuntu-latest
+    steps:
+      - uses: LouisBrunner/checks-action@v0.1.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          name: Check
+          status: in_progress
+          conclusion: neutral
+          output: >-
+            {"summary": "Waiting for deploy to finish"}
+```
+
+```yaml
+# .github/workflows/link-check-deploy.yml
+
 name: Link Check Deploy
 on: deployment_status
 
 jobs:
   run:
-    name: Link Check Deploy
+    name: Check
     runs-on: ubuntu-latest
     if: github.event.deployment_status.state == 'success'
 
@@ -46,19 +71,25 @@ jobs:
 
       - name: Run the link check script
         id: check
-        uses: "iterative/link-check.action@v0.3.0"
+        uses: "iterative/link-check.action@master"
         with:
-          configFile: "./.linkcheckrc.json"
+          configFile: "./config/link-check/config.json"
           rootURL: "${{ github.event.deployment.payload.web_url }}"
+          output: checkAction
 
       - uses: LouisBrunner/checks-action@v0.1.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          name: Link Check Deploy
+          name: Check
           status: completed
           conclusion: ${{ steps.check.outputs.conclusion }}
           output: ${{ steps.check.outputs.output }}
 ```
+
+The initializer is run because `checks-action` doesn't attach its check to a
+deployment when triggered via `deployment_status`
+
+#### Check all links in the repo daily
 
 This workflow ensures that all link exclusion patterns are used throughout the repo:
 
