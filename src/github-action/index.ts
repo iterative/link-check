@@ -40,7 +40,7 @@ async function optionsFromCoreInputs() {
   const {
     configFile,
     output = ["consoleLog", "exitCode"],
-    failsOnly,
+    failsOnly = true,
     verbose = false,
     ...inputOptions
   }: UnresolvedLinkCheckOptions & {
