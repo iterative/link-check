@@ -19,8 +19,10 @@ in `package.json` scripts with options for the site in question.
 For example:
 
 ```json
-    "link-check": "repo-link-check -r='https://www.example.com' --fi='content/**/*.{css,md,json}' --fef='./config/exclude-files' --lef='./config/exclude-links' -z",
-    "link-check-all": "repo-link-check -r='https://www.example.com' --fi='{.github,content,src}/**/*.{css,js,jsx,md,tsx,ts,json}' --fef='./config/exclude-files' --lef='./config/exclude-links' -z -s=filesystem -u"
+    "link-check": "repo-link-check -c config/link-check/config.yml -s filesystem -u",
+    "link-check-diff": "repo-link-check -c config/link-check/config.yml",
+    "link-check-dev-server": "repo-link-check -c config/link-check/config.yml -r http://localhost:3000",
+    "link-check-exclude": "repo-link-check -c config/link-check/config.yml -s filesystem -u only"
 ```
 
 This setup checks all files in the project-relative directory `/content` with `.css`, `.md`, and `.json` extensions for links, resolve root-relative links to be relative to `https://www.example.com` and excluding files based on the lines in `.config/exclude-files` and `.config.exclude-links`
@@ -127,9 +129,10 @@ jobs:
 
 ### config: string
 
-When set by a runner, Link Check will look for a JSON config file relative to
-the root of the repo. Both the CLI and GHA runners can do this, which is
-particularly useful for sharing patterns between the two.
+When set by a runner, Link Check will read this path relative to the root of the
+repo for a configuration file, either in JSON or YAML depending on the
+extension. Both the CLI and GHA runners can do this, which is particularly
+useful for sharing patterns between the two.
 
 ### source: "git-diff" | "filesystem" = "git-diff"
 
@@ -171,6 +174,14 @@ When provided, files whose filenames match a `micromatch` check with this option
 as its pattern will be completely excluded from checks and reports.
 
 Exclusions take precedence over inclusions.
+
+### <file|link><Include|Exclude>PatternFiles: string[]?
+
+These four sister options mirror the `Patterns` variants, but instead take paths
+to files which are top-level arrays in YAML or JSON. These parsed arrays will be
+used alongside ones provided in the related `Patterns` options.
+
+Using external files for this purpose is entirely up to preference.
 
 ### dryRun: boolean
 
