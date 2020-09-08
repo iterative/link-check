@@ -1,8 +1,13 @@
 import defaults from "lodash/defaults";
-import fs from "fs";
 import path from "path";
+import yaml from "js-yaml";
 import { UnresolvedLinkCheckOptions, LinkCheckOptions } from "./types";
-import asyncMap from "./async-map";
+import { transformFileContents, asyncMap } from "./util";
+
+type FilePatternsEntry = [
+  string | string[] | undefined,
+  string | string[] | undefined
+];
 
 const patternsOrGlobstar = (
   patterns: string | string[] | undefined
@@ -17,30 +22,46 @@ const patternsOrGlobstar = (
   return "**";
 };
 
-async function getSingleFileLines(filePath: string): Promise<string[]> {
-  return new Promise((resolve, reject) =>
-    fs.readFile(filePath, (err, buffer) => {
-      if (err) return reject(err);
-      return resolve(String(buffer).split(/\n+/));
-    })
-  );
+export async function optionsFromFile<T = UnresolvedLinkCheckOptions>(
+  filePath?: string
+): Promise<Partial<T>> {
+  if (!filePath) return {};
+  const extension = path.extname(filePath);
+  switch (extension) {
+    case ".yml":
+    case ".yaml":
+      return transformFileContents(filePath, yaml.safeLoad);
+    case ".json":
+      return transformFileContents(filePath, (data: Buffer) =>
+        JSON.parse(String(data))
+      );
+    default:
+      throw new Error(
+        `Options file "${filePath}" has unrecognized extension "${extension}"`
+      );
+  }
 }
 
-async function getFileLines(
+async function readFileArray(filePath: string): Promise<string[]> {
+  const lines = await optionsFromFile<string[]>(filePath);
+  if (!Array.isArray(lines)) {
+    throw new Error(
+      `File "${filePath}" is expected to be an Array, but was a ${typeof lines}!`
+    );
+  }
+  return lines;
+}
+
+async function combineFileArrays(
   filePaths: string[] | string | undefined
 ): Promise<string[]> {
   if (!filePaths) return [];
   return Array.isArray(filePaths)
     ? ([] as string[]).concat(
-        ...(await asyncMap<string, string[]>(filePaths, getSingleFileLines))
+        ...(await asyncMap<string, string[]>(filePaths, readFileArray))
       )
-    : getSingleFileLines(filePaths);
+    : readFileArray(filePaths);
 }
-
-type FilePatternsEntry = [
-  string | string[] | undefined,
-  string | string[] | undefined
-];
 
 export default async function patternsFromFiles(
   entries: FilePatternsEntry[]
@@ -48,23 +69,13 @@ export default async function patternsFromFiles(
   return asyncMap<FilePatternsEntry, string[]>(
     entries,
     async ([filenames, patterns]) => {
-      const filePatterns = await getFileLines(filenames);
+      const filePatterns = await combineFileArrays(filenames);
       return (patterns ? filePatterns.concat(patterns) : filePatterns).filter(
         Boolean
       );
     }
   );
 }
-
-export const optionsFromFile: (
-  filePath: string | undefined
-) => Promise<UnresolvedLinkCheckOptions> = async (filePath) => {
-  if (!filePath) return {};
-  const fileOptions = JSON.parse(
-    String(fs.readFileSync(path.join(process.cwd(), filePath)))
-  );
-  return fileOptions;
-};
 
 export async function mergeAndResolveOptions(
   configs: Array<UnresolvedLinkCheckOptions>

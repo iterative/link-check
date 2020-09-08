@@ -1,6 +1,6 @@
 import checkLink, { getUnusedLinkExcludePatterns } from "./checkLink";
 import scrapeLinks from "./scrapeLinks";
-import asyncMap from "./async-map";
+import { asyncMap } from "./util";
 
 import {
   FileContentEntry,

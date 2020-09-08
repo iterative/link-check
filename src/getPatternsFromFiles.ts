@@ -1,5 +1,5 @@
 import fs from "fs";
-import asyncMap from "./async-map";
+import { asyncMap } from "./util";
 
 export const patternsOrGlobstar = (
   patterns: string | string[] | undefined
