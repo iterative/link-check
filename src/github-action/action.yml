@@ -60,7 +60,7 @@ inputs:
   output:
     description: >-
       A string or JSON array of output methods to use. "consoleLog", "exitCode",
-      and "checkAction" are available. Multiple exit methods will be called in
+      and "checksAction" are available. Multiple exit methods will be called in
       a predetermined order, so their order here does not matter.
       Defaults to ["consoleLog", "exitCode"].
 outputs:

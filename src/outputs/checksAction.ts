@@ -41,7 +41,7 @@ const linkFormatWithStatus = ({ link, href, description, pass }) =>
 const linkFormatWithoutStatus = ({ link, href, description }) =>
   `  - ${link}${href && href !== link ? ` = ${href}` : ""} (${description})`;
 
-function checkActionReporter(
+function checksActionReporter(
   {
     totalChecksCount,
     failedChecksCount,
@@ -116,6 +116,6 @@ function checkActionReporter(
 }
 
 export default {
-  name: "checkAction",
-  reporter: checkActionReporter,
+  name: "checksAction",
+  reporter: checksActionReporter,
 };

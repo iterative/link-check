@@ -6,12 +6,12 @@ import { checkFileEntries } from "../checkFileEntries";
 import useOutputs from "../outputs/useOutputs";
 import consoleLogOutput from "../outputs/consoleLog";
 import exitCodeOutput from "../outputs/exitCode";
-import checkActionOutput from "../outputs/checkAction";
+import checksActionOutput from "../outputs/checksAction";
 
 import { optionsFromFile, mergeAndResolveOptions } from "../getOptions";
 import { UnresolvedLinkCheckOptions } from "../types";
 
-const availableOutputs = [checkActionOutput, consoleLogOutput, exitCodeOutput];
+const availableOutputs = [checksActionOutput, consoleLogOutput, exitCodeOutput];
 
 function getInput(inputName: string): string | string[] {
   const input = core.getInput(inputName);

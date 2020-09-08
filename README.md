@@ -77,7 +77,7 @@ jobs:
         with:
           configFile: "./config/link-check/config.json"
           rootURL: "${{ github.event.deployment.payload.web_url }}"
-          output: checkAction
+          output: checksAction
 
       - uses: LouisBrunner/checks-action@v0.1.0
         with:
@@ -211,7 +211,7 @@ This setting can only be defined in an options file.
 ### output: string[]?
 
 This is a list of output strategies to use on the current run. Both runners can
-use "consoleLog" and "exitCode", and the GitHub Action has a third "checkAction"
+use "consoleLog" and "exitCode", and the GitHub Action has a third "checksAction"
 mode to output to GitHub Actions.
 
 ### failsOnly: boolean
