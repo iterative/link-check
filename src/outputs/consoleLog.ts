@@ -10,7 +10,7 @@ function consoleLogReporter(
   report: ChecksReport,
   options: LinkCheckOptions
 ): void {
-  const { reportUnusedPatterns, failsOnly } = options;
+  const { unusedPatternsOnly, failsOnly } = options;
   const {
     totalChecksCount,
     failedChecksCount,
@@ -27,19 +27,17 @@ function consoleLogReporter(
   } else {
     const reportBody = formatEntries(outputEntries, { failsOnly });
 
-    if (reportUnusedPatterns) {
-      if (unusedPatterns.length > 0) {
-        outputSegments.push(
-          `Some link ignore patterns were unused!\n\n${unusedPatterns.join(
-            "\n"
-          )}`
-        );
-      } else {
+    if (unusedPatterns.length > 0) {
+      outputSegments.push(
+        `Some link ignore patterns were unused!\n\n${unusedPatterns.join("\n")}`
+      );
+    }
+
+    if (unusedPatternsOnly) {
+      if (unusedPatterns.length === 0) {
         outputSegments.push("All link patterns were used.");
       }
-      if (reportUnusedPatterns === "only") {
-        return conclude(outputSegments);
-      }
+      return conclude(outputSegments);
     }
 
     outputSegments.push(reportBody);
@@ -55,7 +53,5 @@ function consoleLogReporter(
   return conclude(outputSegments);
 }
 
-export default {
-  name: "consoleLog",
-  reporter: consoleLogReporter,
-};
+export const name = "consoleLog";
+export const reporter = consoleLogReporter;

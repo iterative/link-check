@@ -49,7 +49,7 @@ function checksActionReporter(
     failedEntries,
     unusedPatterns,
   }: ChecksReport,
-  { reportUnusedPatterns, failsOnly }: LinkCheckOptions
+  { unusedPatternsOnly, failsOnly }: LinkCheckOptions
 ): void {
   const summarySegments = [];
   const descriptionSegments = [];
@@ -73,22 +73,27 @@ function checksActionReporter(
     });
   }
 
-  if (reportUnusedPatterns && unusedPatterns.length > 0) {
+  if (unusedPatterns.length > 0) {
     const unusedPatternsBody = unusedPatterns
       .map((pattern) => `  - ${pattern}`)
       .join("\n\n");
-    summarySegments.push(`Some link patterns were unused`);
     descriptionSegments.push(
       `# Unused link exclusion patterns`,
       unusedPatternsBody
     );
-    if (reportUnusedPatterns === "only") {
-      return conclude({
-        summarySegments,
-        descriptionSegments,
-        success: false,
-      });
+  }
+
+  if (unusedPatternsOnly) {
+    if (unusedPatterns.length === 0) {
+      summarySegments.push("All link patterns were used");
+    } else {
+      summarySegments.push(`Some link patterns were unused`);
     }
+    return conclude({
+      summarySegments,
+      descriptionSegments,
+      success: false,
+    });
   }
 
   const hasError = failedChecksCount > 0;
@@ -115,7 +120,5 @@ function checksActionReporter(
   });
 }
 
-export default {
-  name: "checksAction",
-  reporter: checksActionReporter,
-};
+export const name = "checksAction";
+export const reporter = checksActionReporter;

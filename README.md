@@ -127,7 +127,7 @@ jobs:
 
 ## Options
 
-### config: string
+### configFile: string
 
 When set by a runner, Link Check will read this path relative to the root of the
 repo for a configuration file, either in JSON or YAML depending on the
@@ -175,13 +175,11 @@ as its pattern will be completely excluded from checks and reports.
 
 Exclusions take precedence over inclusions.
 
-### <file|link><Include|Exclude>PatternFiles: string[]?
+### <file|link><Include|Exclude>PatternFile: string?
 
 These four sister options mirror the `Patterns` variants, but instead take paths
 to files which are top-level arrays in YAML or JSON. These parsed arrays will be
 used alongside ones provided in the related `Patterns` options.
-
-Using external files for this purpose is entirely up to preference.
 
 ### dryRun: boolean
 
@@ -189,30 +187,16 @@ When this option is true, no link checks will actually be run. Useful for
 debugging link patterns, as excluded links will have a description distinct from
 those stopped by the dry run alone.
 
-### reportUnusedPatterns: boolean | "only"
+### unusedPatternsOnly: boolean
 
-If set to "only", applies dryRun and skips report logging after reporting unused patterns.
-If otherwise true, unused link exclusion patterns will be logged to output.
+If true, Link Check will use `dryRun`, report unused patterns, and then exit.
 
-### bottlenecks: Map<string, {minTime: number, maxConcurrent: number}
+### output: (string | string[])?
 
-This object determines overrides for the settings of the Bottleneck instances
-used for each hostname. The keys will be tried as a micromatch pattern against
-each link's hostname, and the object at the first match will have its keys
-override the defaults for that instance.
-
-By default, Bottleneck instances only allow one concurrent connection and at
-least 400ms minimum time between each call per hostname. Sites with more
-aggressive 429 responses may require a larger minTime, but the defaults handle
-the majority of sites well.
-
-This setting can only be defined in an options file.
-
-### output: string[]?
-
-This is a list of output strategies to use on the current run. Both runners can
-use "consoleLog" and "exitCode", and the GitHub Action has a third "checksAction"
-mode to output to GitHub Actions.
+Selects the output strategy to use. Both runners can use "consoleLog", and the
+GitHub Action has a "checksAction" mode to generate output for
+`LouisBRunner/checks-action`. Can accept multiple strings to use multiple output
+strategies.
 
 ### failsOnly: boolean
 
@@ -226,45 +210,59 @@ Disabled by default on CLI, enabled by default on GitHub Actions.
 When true, the application will `console.log` the parsed options object before
 running.
 
+### minTime: number
+
+The minimum amount of time in ms to wait before two requests on one domain. Defaults to 400.
+
+### maxConcurrent: number
+
+The maximum amount of requests allowed on each hostname at one time. Defaults to 1.
+
+### linkOptions: Map<string, options>
+
+This object determines settings that will be applied for each hostname. The keys
+will be tried as a micromatch pattern against each link's hostname, and the
+object at the first match will have its keys override the defaults for that
+instance.
+
+By default, each hostname is allowed one concurrent connection and at least
+400ms minimum time between each call per hostname. Sites with more aggressive
+429 responses may require a larger minTime, but the defaults handle the majority
+of sites well.
+
+This setting can only be defined in an options file.
+
+Currently, the only settings here are **minTime** and **maxConcurrent**.
+
 ## Runners
 
 ### CLI
 
-#### Link Check option flags
+#### Help
 
 To specify multiple patterns or pattern files, use the relevant flag multiple times.
+Use `-h` to get this help output:
 
-##### -c / --config
+```
+Usage: repo-link-check [options]
 
-##### -s / --source
+Options:
+  -c, --configFile <path>               Path to the configuration file
+  -r, --rootURL <url>                   Check root-relative links relative to this URL
+  -o, --output <strategy[,strategy]>    Use one or more strategies to generate report output
+  -d, --diff                            Use git diff from origin/master as a source instead of the whole filesystem.
+  --dryRun                              Skip checking parsed links and report them as skipped
+  -u, --unusedPatternsOnly              Do a dry run and exit after printing unused patterns
+  -f, --failsOnly                       Only report failing links
+  -v, --verbose                         Log fully resolved options
+  -li, --linkIncludePatterns <pattern>  Add a micromatch pattern used to whitelist links
+  -le, --linkExcludePatterns <pattern>  Add a micromatch pattern used to exclude links
+  -fi, --fileIncludePatterns <pattern>  Add a micromatch pattern used to whitelist files to scrape links from
+  -fe, --fileExcludePatterns <pattern>  Add a micromatch pattern used to exclude files to scrape links from
+  -h, --help                            display help for command
 
-##### -r / --rootURL
-
-##### --li / --link-include-pattern
-
-##### --le / --link-exclude-pattern
-
-##### --fi / --file-include-pattern
-
-##### --fe / --file-exclude-pattern
-
-##### --lif / --link-include-pattern-file
-
-##### --lef / --link-exclude-pattern-file
-
-##### --fif / --file-include-pattern-file
-
-##### --fef / --file-exclude-pattern-file
-
-##### -d / --dry-run
-
-##### -u / --report-unused-patterns
-
-##### -o / --output
-
-##### -f / --fails-only
-
-##### -v / --verbose
+To specify multiple patterns, use the relevant flag multiple times.
+```
 
 Log fully parsed options before starting. File-based patterns will have already
 been resolved and combined with ones defined in arguments.
@@ -281,25 +279,25 @@ strings as the relevant option's input.
 
 ##### rootURL
 
-##### linkIncludePatternFiles
+##### linkIncludePatternFile
 
 ##### linkIncludePatterns
 
-##### linkExcludePatternFiles
+##### linkExcludePatternFile
 
 ##### linkExcludePatterns
 
-##### fileIncludePatternFiles
+##### fileIncludePatternFile
 
 ##### fileIncludePatterns
 
-##### fileExcludePatternFiles
+##### fileExcludePatternFile
 
 ##### fileExcludePatterns
 
 ##### dryRun
 
-##### reportUnusedPatterns
+##### unusedPatternsOnly
 
 ##### output
 

@@ -18,13 +18,15 @@ export interface FileChecksEntry extends FileEntry {
 }
 
 interface CoreLinkCheckOptions {
-  source?: string;
+  diff?: boolean;
   rootURL?: string;
-  reportUnusedPatterns?: boolean | "only";
+  unusedPatternsOnly?: boolean;
   dryRun?: boolean;
   verbose?: boolean;
-  bottlenecks?: Map<string, BottleneckOptions>;
+  linkOptions?: Map<string, LinkOptions>;
   failOnUnusedPatterns?: boolean;
+  minTime?: number;
+  maxConcurrent?: number;
 }
 
 export interface LinkCheckOptions extends CoreLinkCheckOptions {
@@ -41,10 +43,10 @@ export interface UnresolvedLinkCheckOptions extends CoreLinkCheckOptions {
   linkExcludePatterns?: string | string[];
   fileIncludePatterns?: string | string[];
   fileExcludePatterns?: string | string[];
-  linkIncludePatternFiles?: string | string[];
-  linkExcludePatternFiles?: string | string[];
-  fileIncludePatternFiles?: string | string[];
-  fileExcludePatternFiles?: string | string[];
+  linkIncludePatternFile?: string;
+  linkExcludePatternFile?: string;
+  fileIncludePatternFile?: string;
+  fileExcludePatternFile?: string;
   output?: string[] | string;
   failsOnly?: boolean | "false";
 }
@@ -61,9 +63,9 @@ export interface CheckedLink {
   href?: string;
 }
 
-export interface BottleneckOptions {
-  minTime: number;
-  maxConcurrent: number;
+export interface LinkOptions {
+  minTime?: number;
+  maxConcurrent?: number;
 }
 
 export interface ChecksReport {

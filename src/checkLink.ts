@@ -5,21 +5,19 @@ import {
   LinkCheckArgs,
   LinkCheckOptions,
   CheckedLink,
-  BottleneckOptions,
+  LinkOptions,
 } from "./types";
 
 const hostBottlenecks = {};
 const getBottleneck = (hostname: string, options: LinkCheckOptions) => {
   if (!hostBottlenecks[hostname]) {
-    const bottleneckOverrideEntry = Object.entries(
-      options.bottlenecks
+    const currentLinkOptionsEntry = Object.entries(
+      options.linkOptions
     ).find(([pattern]) => mm.isMatch(hostname, pattern));
     const {
-      minTime = 400,
-      maxConcurrent = 1,
-    }: BottleneckOptions = bottleneckOverrideEntry
-      ? bottleneckOverrideEntry[1]
-      : {};
+      minTime = options.minTime || 400,
+      maxConcurrent = options.maxConcurrent || 1,
+    }: LinkOptions = currentLinkOptionsEntry ? currentLinkOptionsEntry[1] : {};
     hostBottlenecks[hostname] = new Bottleneck({ minTime, maxConcurrent });
   }
   return hostBottlenecks[hostname];

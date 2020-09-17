@@ -22,17 +22,21 @@ const patternsOrGlobstar = (
   return "**";
 };
 
-export async function optionsFromFile<T = UnresolvedLinkCheckOptions>(
+export async function parseFile<T = Partial<UnresolvedLinkCheckOptions>>(
   filePath?: string
-): Promise<Partial<T>> {
-  if (!filePath) return {};
+): Promise<T | null> {
+  if (!filePath) return null;
+
   const extension = path.extname(filePath);
   switch (extension) {
     case ".yml":
     case ".yaml":
-      return transformFileContents(filePath, yaml.safeLoad);
+      return transformFileContents<T>(
+        filePath,
+        (data) => (yaml.safeLoad(String(data)) as unknown) as T
+      );
     case ".json":
-      return transformFileContents(filePath, (data: Buffer) =>
+      return transformFileContents<T>(filePath, (data: Buffer) =>
         JSON.parse(String(data))
       );
     default:
@@ -43,7 +47,7 @@ export async function optionsFromFile<T = UnresolvedLinkCheckOptions>(
 }
 
 async function readFileArray(filePath: string): Promise<string[]> {
-  const lines = await optionsFromFile<string[]>(filePath);
+  const lines = await parseFile<string[]>(filePath);
   if (!Array.isArray(lines)) {
     throw new Error(
       `File "${filePath}" is expected to be an Array, but was a ${typeof lines}!`
@@ -85,18 +89,19 @@ export async function mergeAndResolveOptions(
     ...configs.filter(Boolean)
   );
   const {
+    diff = false,
     fileIncludePatterns,
     fileExcludePatterns,
-    fileIncludePatternFiles,
-    fileExcludePatternFiles,
+    fileIncludePatternFile,
+    fileExcludePatternFile,
     linkIncludePatterns,
     linkExcludePatterns,
-    linkIncludePatternFiles,
-    linkExcludePatternFiles,
-    reportUnusedPatterns,
-    dryRun = reportUnusedPatterns === "only",
-    failOnUnusedPatterns = reportUnusedPatterns === "only",
-    bottlenecks = {},
+    linkIncludePatternFile,
+    linkExcludePatternFile,
+    unusedPatternsOnly,
+    dryRun = unusedPatternsOnly,
+    failOnUnusedPatterns = unusedPatternsOnly,
+    linkOptions = {},
     output,
     ...rest
   } = mergedOptions;
@@ -107,16 +112,17 @@ export async function mergeAndResolveOptions(
     resolvedFileIncludePatterns,
     resolvedFileExcludePatterns,
   ] = await patternsFromFiles([
-    [linkIncludePatternFiles, linkIncludePatterns],
-    [linkExcludePatternFiles, linkExcludePatterns],
-    [fileIncludePatternFiles, fileIncludePatterns],
-    [fileExcludePatternFiles, fileExcludePatterns],
+    [linkIncludePatternFile, linkIncludePatterns],
+    [linkExcludePatternFile, linkExcludePatterns],
+    [fileIncludePatternFile, fileIncludePatterns],
+    [fileExcludePatternFile, fileExcludePatterns],
   ]);
 
   return ({
     ...rest,
-    bottlenecks,
-    reportUnusedPatterns,
+    diff,
+    linkOptions,
+    unusedPatternsOnly,
     dryRun,
     output: output && (Array.isArray(output) ? output : [output]),
     failOnUnusedPatterns,

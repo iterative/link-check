@@ -1,72 +1,101 @@
-import minimist from "minimist";
+import { Command } from "commander";
 import { checkFileEntries } from "./checkFileEntries";
-import { optionsFromFile, mergeAndResolveOptions } from "./getOptions";
+import { parseFile, mergeAndResolveOptions } from "./getOptions";
 import { LinkCheckOptions } from "./types";
 import getContentEntries from "./inputs/index";
-import useOutputs from "./outputs/useOutputs";
-import consoleOutput from "./outputs/consoleLog";
-import exitCodeOutput from "./outputs/exitCode";
+import { reporter } from "./outputs/consoleLog";
+import exitWithCode from "./exitWithCode";
 
-const availableOutputs = [consoleOutput, exitCodeOutput];
+function commaSeparatedList(current: string) {
+  return current.split(",");
+}
+
+function collect(current, acc) {
+  return acc ? [...acc, current] : [current];
+}
 
 const optionsFromFlags: () => Promise<LinkCheckOptions> = async () => {
-  const {
-    config,
-    source = "git-diff",
-    rootURL,
-    "file-include-pattern": fileIncludePatterns,
-    "file-exclude-pattern": fileExcludePatterns,
-    "file-include-pattern-file": fileIncludePatternFiles,
-    "file-exclude-pattern-file": fileExcludePatternFiles,
-    "link-include-pattern": linkIncludePatterns,
-    "link-exclude-pattern": linkExcludePatterns,
-    "link-include-pattern-file": linkIncludePatternFiles,
-    "link-exclude-pattern-file": linkExcludePatternFiles,
-    "report-unused-patterns": reportUnusedPatterns,
-    "dry-run": dryRun = reportUnusedPatterns === "only",
-    "fails-only": failsOnly = false,
-    verbose,
-    output = ["consoleLog"],
-  } = minimist(process.argv.slice(2), {
-    alias: {
-      c: "config",
-      s: "source",
-      u: "report-unused-patterns",
-      r: "rootURL",
-      d: "dry-run",
-      li: "link-include-pattern",
-      le: "link-exclude-pattern",
-      fi: "file-include-pattern",
-      fe: "file-exclude-pattern",
-      lif: "link-include-pattern-file",
-      lef: "link-exclude-pattern-file",
-      fif: "file-include-pattern-file",
-      fef: "file-exclude-pattern-file",
-      v: "verbose",
-      o: "output",
-      f: "fails-only",
-    },
-  });
+  const program = new Command();
 
-  const argsOptions = {
-    source,
+  program
+    .name("repo-link-check")
+    .usage("[options]")
+    .option("-c, --configFile <path>", "Path to the configuration file")
+    .option(
+      "-r, --rootURL <url>",
+      "Check root-relative links relative to this URL"
+    )
+    .option(
+      "-o, --output <strategy[,strategy]>",
+      "Use one or more strategies to generate report output",
+      commaSeparatedList
+    )
+    .option(
+      "-d, --diff",
+      "Use git diff from origin/master as a source instead of the whole filesystem."
+    )
+    .option("--dryRun", "Skip checking parsed links and report them as skipped")
+    .option(
+      "-u, --unusedPatternsOnly",
+      "Do a dry run and exit after printing unused patterns"
+    )
+    .option("-f, --failsOnly", "Only report failing links")
+    .option("-v, --verbose", "Log fully resolved options")
+    .option(
+      "-li, --linkIncludePatterns <pattern>",
+      "Add a micromatch pattern used to whitelist links",
+      collect
+    )
+    .option(
+      "-le, --linkExcludePatterns <pattern>",
+      "Add a micromatch pattern used to exclude links",
+      collect
+    )
+    .option(
+      "-fi, --fileIncludePatterns <pattern>",
+      "Add a micromatch pattern used to whitelist files to scrape links from",
+      collect
+    )
+    .option(
+      "-fe, --fileExcludePatterns <pattern>",
+      "Add a micromatch pattern used to exclude files to scrape links from",
+      collect
+    )
+    .on("--help", () => {
+      console.log(
+        "\nTo specify multiple patterns, use the relevant flag multiple times."
+      );
+    })
+    .parse(process.argv);
+
+  const {
+    configFile,
+    diff,
     rootURL,
     fileIncludePatterns,
     fileExcludePatterns,
-    fileIncludePatternFiles,
-    fileExcludePatternFiles,
     linkIncludePatterns,
     linkExcludePatterns,
-    linkIncludePatternFiles,
-    linkExcludePatternFiles,
-    reportUnusedPatterns,
+    unusedPatternsOnly,
+    dryRun = unusedPatternsOnly,
+    failsOnly,
+    verbose,
+  } = program;
+
+  const argsOptions = {
+    diff,
+    rootURL,
+    fileIncludePatterns,
+    fileExcludePatterns,
+    linkIncludePatterns,
+    linkExcludePatterns,
+    unusedPatternsOnly,
     verbose,
     dryRun,
-    output,
     failsOnly,
   };
 
-  const fileOptions = await optionsFromFile(config);
+  const fileOptions = await parseFile(configFile);
 
   return mergeAndResolveOptions([argsOptions, fileOptions]);
 };
@@ -76,7 +105,8 @@ async function main() {
   if (options.verbose) console.log("Options:", options);
   const fileEntries = await getContentEntries(options);
   const report = await checkFileEntries(fileEntries, options);
-  useOutputs(availableOutputs, options, report);
+  reporter(report, options);
+  exitWithCode(report, options);
 }
 
 main();

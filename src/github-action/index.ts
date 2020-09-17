@@ -4,14 +4,14 @@ import { exec } from "child_process";
 import getContentEntries from "../inputs";
 import { checkFileEntries } from "../checkFileEntries";
 import useOutputs from "../outputs/useOutputs";
-import consoleLogOutput from "../outputs/consoleLog";
-import exitCodeOutput from "../outputs/exitCode";
-import checksActionOutput from "../outputs/checksAction";
+import * as consoleLogOutput from "../outputs/consoleLog";
+import * as checksActionOutput from "../outputs/checksAction";
+import exitWithCode from "../exitWithCode";
 
-import { optionsFromFile, mergeAndResolveOptions } from "../getOptions";
+import { parseFile, mergeAndResolveOptions } from "../getOptions";
 import { UnresolvedLinkCheckOptions } from "../types";
 
-const availableOutputs = [checksActionOutput, consoleLogOutput, exitCodeOutput];
+const availableOutputs = [checksActionOutput, consoleLogOutput];
 
 function getInput(inputName: string): string | string[] {
   const input = core.getInput(inputName);
@@ -39,7 +39,7 @@ function parseStringValue(value) {
 async function optionsFromCoreInputs() {
   const {
     configFile,
-    output = ["consoleLog", "exitCode"],
+    output = "consoleLog",
     failsOnly = true,
     verbose = false,
     ...inputOptions
@@ -50,16 +50,17 @@ async function optionsFromCoreInputs() {
     "configFile",
     "rootURL",
     "dryRun",
-    "reportUnusedPatterns",
+    "unusedPatternsOnly",
+    "diff",
 
-    "linkIncludePatternFiles",
+    "linkIncludePatternFile",
     "linkIncludePatterns",
-    "linkExcludePatternFiles",
+    "linkExcludePatternFile",
     "linkExcludePatterns",
 
-    "fileIncludePatternFiles",
+    "fileIncludePatternFile",
     "fileIncludePatterns",
-    "fileExcludePatternFiles",
+    "fileExcludePatternFile",
     "fileExcludePatterns",
     "output",
     "failsOnly",
@@ -72,11 +73,11 @@ async function optionsFromCoreInputs() {
   return mergeAndResolveOptions([
     {
       ...inputOptions,
-      output,
+      output: typeof output === "string" ? [output] : output,
       failsOnly,
       verbose,
     },
-    await optionsFromFile(configFile),
+    await parseFile(configFile),
   ]);
 }
 
@@ -94,5 +95,10 @@ async function main() {
   const fileEntries = await getContentEntries(options);
   const report = await checkFileEntries(fileEntries, options);
   useOutputs(availableOutputs, options, report);
+  if (!options.output.includes("checksAction")) {
+    exitWithCode(report, options);
+  } else {
+    process.exit(0);
+  }
 }
 main();

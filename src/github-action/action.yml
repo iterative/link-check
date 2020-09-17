@@ -9,11 +9,10 @@ inputs:
     description: "The source to collect content entries from"
   dryRun:
     description: "Skip the check on links that otherwise would have one"
-  reportUnusedPatterns:
+  unusedPatternsOnly:
     description: >-
-      If true, informs about all link exclusion patterns that went unused.
-      If set to "only", turns on dryRun and uses this check as the result.
-  linkIncludePatternFiles:
+      If true, turns on dryRun and exits after reporting unused link patterns.
+  linkIncludePatternFile:
     description: >-
       A string or JSON array of filenames to use as link inclusion files.
       Read as one micromatch pattern per line.
@@ -24,7 +23,7 @@ inputs:
       A string or JSON array of micromatch patterns to whitelist links.
       If no include patterns are provided, all links are attempted.
     required: false
-  linkExcludePatternFiles:
+  linkExcludePatternFile:
     description: >-
       A string or JSON array of filenames to use as link exclusion files.
       Read as one micromatch pattern per line.
@@ -35,7 +34,7 @@ inputs:
       Takes priority over inclusion patterns.
     required: false
 
-  fileIncludePatternFiles:
+  fileIncludePatternFile:
     description: >-
       A string or JSON array of paths to read as link inclusion files.
       Read as one micromatch pattern per line.
@@ -46,7 +45,7 @@ inputs:
       A string or JSON array of micromatch patterns to whitelist files.
       If no include patterns are provided, all files will be scraped for links.
     required: false
-  fileExcludePatternFiles:
+  fileExcludePatternFile:
     description: >-
       A string or JSON array of paths to read as link exclusion files.
       Read as one micromatch pattern per line.
@@ -59,13 +58,12 @@ inputs:
     required: false
   output:
     description: >-
-      A string or JSON array of output methods to use. "consoleLog", "exitCode",
-      and "checksAction" are available. Multiple exit methods will be called in
-      a predetermined order, so their order here does not matter.
-      Defaults to ["consoleLog", "exitCode"].
+      A string or JSON array of output methods to use. "consoleLog" and
+      "checksAction" are available. Can be specified as a string to use one
+      strategy, or a JSON array to use multiple.
 outputs:
   output:
-    description: "A JSON string with the test output to be handed to the Check Run"
+    description: "A stringified JSON object containing output for LouisBRunner/checks-action"
   conclusion:
     description: "A GitHub Checks-compatible conclusion of the report"
 runs:
