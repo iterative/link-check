@@ -134,14 +134,14 @@ repo for a configuration file, either in JSON or YAML depending on the
 extension. Both the CLI and GHA runners can do this, which is particularly
 useful for sharing patterns between the two.
 
-### source: "git-diff" | "filesystem" = "git-diff"
+### diff: boolean
 
-This string determines how the action will source content
-
-"git-diff" uses the diff between the current working area and origin/master. It
-effectively means that this mode checks links that would be new to master if the
-current state of the program were merged, and that this will provide no links
-when checking out an up-to-date master.
+When true, uses the output of a git diff between the current working area and
+origin/master as input, as opposed to the default behavior of reading the
+filesystem.
+It effectively means that this mode checks links that would be new to master if
+the current state of the program were merged, and that this will provide no
+links when checking out an up-to-date master.
 
 ### rootURL: string
 

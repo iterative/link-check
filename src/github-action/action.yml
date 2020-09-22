@@ -5,8 +5,8 @@ inputs:
     description: "The URL that root-relative links will have prepended to them"
   configFile:
     description: "A JSON file in the repo used to configure the link check"
-  source:
-    description: "The source to collect content entries from"
+  diff:
+    description: "If true, links will be sourced from Git diff output instead of the filesystem"
   dryRun:
     description: "Skip the check on links that otherwise would have one"
   unusedPatternsOnly:
