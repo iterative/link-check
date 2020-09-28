@@ -49,7 +49,7 @@ function checksActionReporter(
     failedEntries,
     unusedPatterns,
   }: ChecksReport,
-  { unusedPatternsOnly, failsOnly }: LinkCheckOptions
+  { unusedPatternsOnly, failsOnly, diff }: LinkCheckOptions
 ): void {
   const summarySegments = [];
   const descriptionSegments = [];
@@ -73,7 +73,7 @@ function checksActionReporter(
     });
   }
 
-  if (unusedPatterns.length > 0) {
+  if (!diff && unusedPatterns.length > 0) {
     const unusedPatternsBody = unusedPatterns
       .map((pattern) => `  - ${pattern}`)
       .join("\n\n");
