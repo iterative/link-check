@@ -2,19 +2,29 @@ import { exec } from "child_process";
 import mm from "micromatch";
 import { FileContentEntry, LinkCheckOptions } from "../types";
 
+const shellPromise = (command: string): Promise<string> =>
+  new Promise((resolve, reject) =>
+    exec(command, (err, stdout) => (err ? reject(err) : resolve(stdout)))
+  );
+
 const getGitDiffPatchText: () => Promise<string> = async () =>
-  new Promise((resolve, reject) => {
-    exec("git diff -U0 --minimal origin/master", (err, stdout) =>
-      err ? reject(err) : resolve(stdout)
-    );
-  });
+  shellPromise("git diff -U0 --minimal origin/master");
+
+const setGitOrigin: (origin: string) => Promise<void> = async (origin) => {
+  await shellPromise("git remote remove origin");
+  await shellPromise(`git remote add origin ${origin}`);
+};
 
 const getFileContentEntries: (
   options: LinkCheckOptions
 ) => Promise<FileContentEntry[]> = async ({
   fileIncludePatterns,
   fileExcludePatterns,
+  origin,
 }) => {
+  if (origin) {
+    await setGitOrigin(origin);
+  }
   const splitPatchText = (await getGitDiffPatchText()).split(
     /^diff --git.* b\/(.*)\n(?:.*\n){4}/gm
   );

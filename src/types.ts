@@ -36,6 +36,7 @@ export interface LinkCheckOptions extends CoreLinkCheckOptions {
   fileExcludePatterns?: string[];
   output?: string[];
   failsOnly?: boolean;
+  origin?: string;
 }
 
 export interface UnresolvedLinkCheckOptions extends CoreLinkCheckOptions {
