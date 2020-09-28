@@ -34,28 +34,37 @@ const bottleneckedFetch: (
 
 const fetchWithRetries = async (
   url: URL,
-  fetchOptions = {},
+  fetchOptions: { retries?: number } = {},
   options: LinkCheckOptions
 ) => {
+  const { retries = 0 } = fetchOptions;
+  const { maxRetries = 3 } = options;
   const res = await bottleneckedFetch(
     url,
     { ...fetchOptions, method: "HEAD" },
     options
   );
-  if (res.status === 405) {
-    return bottleneckedFetch(url, { ...fetchOptions, method: "GET" }, options);
-  }
-  if (res.status === 429) {
+
+  if (res.status === 429 && retries < maxRetries) {
     const retryAfter = res.headers.get("retry-after");
     if (retryAfter) {
       const retryMs = Number(retryAfter) * 1000;
       return new Promise((resolve) => {
         setTimeout(async () => {
-          resolve(await fetchWithRetries(url, fetchOptions, options));
+          resolve(
+            await fetchWithRetries(
+              url,
+              { ...fetchOptions, retries: retries + 1 },
+              options
+            )
+          );
         }, retryMs);
       });
     }
+  } else if (!res.ok) {
+    return bottleneckedFetch(url, { ...fetchOptions, method: "GET" }, options);
   }
+
   return res;
 };
 

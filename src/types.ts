@@ -27,6 +27,7 @@ interface CoreLinkCheckOptions {
   failOnUnusedPatterns?: boolean;
   minTime?: number;
   maxConcurrent?: number;
+  maxRetries?: number;
 }
 
 export interface LinkCheckOptions extends CoreLinkCheckOptions {
