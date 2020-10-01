@@ -7,8 +7,12 @@ const shellPromise = (command: string): Promise<string> =>
     exec(command, (err, stdout) => (err ? reject(err) : resolve(stdout)))
   );
 
-const getGitDiffPatchText: () => Promise<string> = async () =>
-  shellPromise("git diff -U0 --minimal origin/master");
+const getGitDiffPatchText: () => Promise<string> = async () => {
+  const mergeBase = (
+    await shellPromise("git merge-base origin/master HEAD")
+  ).trim();
+  return shellPromise(`git diff -U0 --minimal ${mergeBase}`);
+};
 
 const setGitOrigin: (origin: string) => Promise<void> = async (origin) => {
   await shellPromise("git remote remove origin");
