@@ -61,7 +61,7 @@ function checksActionReporter(
 
   if (totalChecksCount === 0) {
     return conclude({
-      summary: "There were no files to check links in.",
+      summary: "There were no links to check.",
       success: true,
     });
   }
