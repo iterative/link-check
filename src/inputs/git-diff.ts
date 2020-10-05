@@ -4,7 +4,19 @@ import { FileContentEntry, LinkCheckOptions } from "../types";
 
 const shellPromise = (command: string): Promise<string> =>
   new Promise((resolve, reject) =>
-    exec(command, (err, stdout) => (err ? reject(err) : resolve(stdout)))
+    exec(command, (error, stdout, stderr) =>
+      error
+        ? reject(
+            new Error(
+              JSON.stringify({
+                error,
+                stdout,
+                stderr,
+              })
+            )
+          )
+        : resolve(stdout)
+    )
   );
 
 const getGitDiffPatchText: () => Promise<string> = async () => {
