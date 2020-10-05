@@ -8,15 +8,30 @@ const shellPromise = (command: string): Promise<string> =>
   );
 
 const getGitDiffPatchText: () => Promise<string> = async () => {
-  const mergeBase = (
-    await shellPromise("git merge-base origin/master HEAD")
-  ).trim();
-  return shellPromise(`git diff -U0 --minimal ${mergeBase}`);
+  let base = "origin/master";
+  try {
+    base = (await shellPromise("git merge-base origin/master HEAD")).trim();
+  } catch (e) {
+    throw new Error(
+      `There was an error trying to get a merge-base! Falling back on "origin/master". (${e})`
+    );
+  }
+  try {
+    return shellPromise(`git diff -U0 --minimal ${base} HEAD`);
+  } catch (e) {
+    throw new Error(
+      `There was an error trying to get a diff between ${base} and HEAD! (${e})`
+    );
+  }
 };
 
 const setGitOrigin: (origin: string) => Promise<void> = async (origin) => {
-  await shellPromise("git remote remove origin");
-  await shellPromise(`git remote add origin ${origin}`);
+  try {
+    await shellPromise("git remote remove origin");
+    await shellPromise(`git remote add origin ${origin}`);
+  } catch (e) {
+    throw new Error(`There was an error switching origin to ${origin}!`);
+  }
 };
 
 const getFileContentEntries: (
