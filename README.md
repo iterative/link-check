@@ -305,16 +305,26 @@ strings as the relevant option's input.
 
 ## Contributing
 
-Despite the submodule, contributing is as simple as any standard repo.
+The source repo can be found at
+[iterative/link-check](https://github.com/iterative/link-check). There's also a
+dist repo for the GitHub Action at
+[iterative/link-check.action](https://github.com/iterative/link-check.action),
+which serves to host only the code required to run in GitHub Actions CI and be
+posted on the marketplace.
 
 To test out a source-built CLI runner, build it with `yarn build` and then run
 `dist/cli.js` with `node` and the flags to test with in the directory of the
 project to test on.
 
-## Deploying
+## Deploying the CLI
 
-The multi-target nature of this repo makes deploying more complex than usual,
-but still manageable if one knows how to do so.
+The CLI app is deployed like any other `npm` package.
+
+## Deploying the GitHub Action
+
+The multi-target nature of this repo makes deploying the GitHub Action more
+complex than usual, but manageable with a couple tweaks to the workflow. (And
+probably a CI action in the future)
 
 Here's the current flow to build and deploy a change to the action:
 
@@ -325,5 +335,3 @@ Here's the current flow to build and deploy a change to the action:
 3. Add the changed submodule, then commit the whole thing.
 
 4. Push with `--recurse-submodules=on-demand`, or otherwise push both repos.
-
-The CLI, on the other hand, is the standard `yarn build` and `yarn publish`.
