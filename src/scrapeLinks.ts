@@ -29,7 +29,7 @@ const scrapeFromString: (filePath: string, content: string) => string[] = (
       );
       const mdRefLinks = regexMap(
         content,
-        /\[.*?\]:\s*\n?\s*(.*)/gm,
+        /\[.*\]:\s*\n?\s*(.*)/gm,
         (x) => x[2] || x[1]
       );
       const hrefLinks = regexMap(content, /href="(.*?)"/gm);
