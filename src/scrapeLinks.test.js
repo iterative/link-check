@@ -5,6 +5,13 @@ Markdown example with a [link to Google](https://www.google.com), one [with a UR
 
 - One [to reddit](www.reddit.com)
 - A fourth [to Facebook](facebook.com) (incomplete URLs)
+- Finally a few [ref] [links][links] [here][link-here]
+
+[ref]: https://www.ref.com
+[links]:
+  www.links.in/newline
+[link-here]:
+  /just/a/path
 
 There's also some blank lines, misc. text, and <span>HTML</span> code.
 `;
@@ -23,6 +30,9 @@ const markdownTestResult = [
   "https://www.google.com/nested/page.html",
   "www.reddit.com",
   "facebook.com",
+  "https://www.ref.com",
+  "www.links.in/newline",
+  "/just/a/path",
 ];
 
 const plaintextTestResult = [
