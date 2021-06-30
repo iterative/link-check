@@ -66,7 +66,7 @@ const getFileContentEntries: (
     /^diff --git.* b\/(.*)\n(?:.*\n){4}/gm
   );
 
-  const processedOutputs = [];
+  const processedOutputs: FileContentEntry[] = [];
   for (let i = 1; i < splitPatchText.length; i += 2) {
     const filePath = splitPatchText[i];
     if (
@@ -74,7 +74,8 @@ const getFileContentEntries: (
     ) {
       const content = splitPatchText[i + 1]
         .split("\n")
-        .filter((line) => line.startsWith("+"));
+        .filter((line) => line.startsWith("+"))
+        .join("\n");
 
       if (content.length > 0) {
         processedOutputs.push({

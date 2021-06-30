@@ -54,16 +54,6 @@ test("It scrapes from the markdown test string", () => {
   ).toEqual(markdownTestResult);
 });
 
-test("It scrapes from the markdown test split by newlines", () => {
-  const splitTest = markdownString.split("\n");
-  expect(
-    scrapeLinks({
-      filePath: "test.md",
-      content: splitTest,
-    })
-  ).toEqual(markdownTestResult);
-});
-
 test("It scrapes absolute links from unrecognized extensions", () => {
   expect(
     scrapeLinks({

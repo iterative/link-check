@@ -7,10 +7,7 @@ export interface StringFilter {
 }
 
 export interface FileContentEntry extends FileEntry {
-  content:
-    | string
-    | string[]
-    | ((filePath?: string) => string | string[] | Promise<string | string[]>);
+  content: string | ((filePath?: string) => string | Promise<string>);
 }
 
 export interface FileChecksEntry extends FileEntry {
