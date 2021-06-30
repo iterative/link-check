@@ -12,9 +12,10 @@ There's also some blank lines, misc. text, and <span>HTML</span> code.
 const plaintextString = `
 This string is plaintext, with links like https://www.google.com and https://www.google.com/nested/page.html
 
-I can scrape "https://reddit.com/r/subreddit" and (https://facebook.com) as well!
+I can scrape "https://reddit.com/r/subreddit" and (https://facebook.com) as well! The new regex can pull www.youtube.com too!?
 
-The new regex can pull www.youtube.com too!? Unfortunately, gmail.com is just too vague.
+TODO: Unfortunately, gmail.com is just too vague.
+TODO: Ending in a period won't work well either, e.g. www.something.com.
 `;
 
 const markdownTestResult = [
@@ -30,6 +31,7 @@ const plaintextTestResult = [
   "https://reddit.com/r/subreddit",
   "https://facebook.com",
   "www.youtube.com",
+  "www.something.com.",
 ];
 
 test("It scrapes from the markdown test string", () => {
