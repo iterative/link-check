@@ -1,11 +1,12 @@
 import scrapeLinks from "./scrapeLinks";
 
 const markdownString = `
-Markdown example with a [link to Google](https://www.google.com), one [with a URL path](https://www.google.com/nested/page.html), and others:
+Markdown sample with a [link to Google](https://www.google.com), one [with a URL path](https://www.google.com/nested/page.html), and others:
 
 - One [to reddit](www.reddit.com)
 - A fourth [to Facebook](facebook.com) (incomplete URLs)
 - Finally a few [ref] [links][links] [here][link-here]
+- BTW it shouldn't plain links like http://www.this.com or that.com shouldn't get picked up.
 
 [ref]: https://www.ref.com
 [links]:
