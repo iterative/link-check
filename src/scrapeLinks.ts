@@ -27,8 +27,13 @@ const scrapeFromString: (filePath: string, content: string) => string[] = (
         /\[.*?\]\((?:<((?:\(.*?\)|.)*?)>|((?:\(.*?\)|.)*?))(?: ["'].*?["'])?\)/gm,
         (x) => x[2] || x[1]
       );
+      const mdRefLinks = regexMap(
+        content,
+        /\[.*\]:\s*\n?\s*(.*)/gm,
+        (x) => x[2] || x[1]
+      );
       const hrefLinks = regexMap(content, /href="(.*?)"/gm);
-      const links = mdLinks.concat(hrefLinks);
+      const links = mdLinks.concat(mdRefLinks).concat(hrefLinks);
       return links
         ? links
             .filter(Boolean)
