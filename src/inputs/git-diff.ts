@@ -75,6 +75,7 @@ const getFileContentEntries: (
       const content = splitPatchText[i + 1]
         .split("\n")
         .filter((line) => line.startsWith("+"))
+        .map((line) => line.slice(1))
         .join("\n");
 
       if (content.length > 0) {
