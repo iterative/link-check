@@ -7,7 +7,7 @@ const cliConfig = {
   entry: "./cli.ts",
   plugins: [
     new webpack.BannerPlugin({
-      banner: "#!/bin/node",
+      banner: "#!/usr/bin/env node",
       entryOnly: true,
       raw: true,
     }),
