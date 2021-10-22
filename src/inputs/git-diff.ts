@@ -19,26 +19,14 @@ const shellPromise = (command: string): Promise<string> =>
     )
   );
 
-const getDiffBase: () => Promise<string> = async (
+const getGitDiffPatchText: () => Promise<string> = async (
   ancestor = "origin/master"
 ) => {
   try {
-    return (await shellPromise(`git merge-base ${ancestor} HEAD`)).trim();
-  } catch (e) {
-    console.warn(
-      `There was an error trying to get a merge-base! Falling back to "${ancestor}"`
-    );
-    return ancestor;
-  }
-};
-
-const getGitDiffPatchText: () => Promise<string> = async () => {
-  const base = await getDiffBase();
-  try {
-    return shellPromise(`git diff -U0 --minimal ${base} HEAD`);
+    return shellPromise(`git diff -U0 --minimal ${ancestor}...HEAD`);
   } catch (e) {
     throw new Error(
-      `There was an error trying to get a diff between ${base} and HEAD! (${e})`
+      `There was an error trying to get a diff between ${ancestor} and HEAD! (${e})`
     );
   }
 };
