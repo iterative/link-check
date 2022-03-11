@@ -15,7 +15,7 @@ export interface FileChecksEntry extends FileEntry {
 }
 
 interface CoreLinkCheckOptions {
-  diff?: boolean;
+  diff?: boolean | string;
   rootURL?: string;
   unusedPatternsOnly?: boolean;
   dryRun?: boolean;

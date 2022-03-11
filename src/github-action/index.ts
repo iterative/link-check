@@ -82,15 +82,16 @@ async function optionsFromCoreInputs() {
 }
 
 async function main() {
-  const gitFetchPromise = new Promise((resolve, reject) => {
-    exec("git fetch origin master", (err) => (err ? reject(err) : resolve()));
-  });
-
   const options = await optionsFromCoreInputs();
 
   if (options.verbose) console.log("Options:", options);
 
-  await gitFetchPromise;
+  if (options.diff)
+    await new Promise<void>((resolve, reject) => {
+      exec(`git fetch origin ${options.diff}`, (err) =>
+        err ? reject(err) : resolve()
+      );
+    });
 
   const fileEntries = await getContentEntries(options);
   const report = await checkFileEntries(fileEntries, options);

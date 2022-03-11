@@ -120,7 +120,7 @@ export async function mergeAndResolveOptions(
 
   return ({
     ...rest,
-    diff,
+    diff: diff === true ? "main" : diff,
     linkOptions,
     unusedPatternsOnly,
     dryRun,

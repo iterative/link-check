@@ -1,11 +1,14 @@
 name: "Link Check"
-description: "Check that all new links compared to master respond properly"
+description: "Check that all new links compared to main respond properly"
 inputs:
   rootURL:
     description: "The URL that root-relative links will have prepended to them"
   origin:
     description: "If provided, remove given git origin and replace with the value of this option. Necessary for forked repos."
     required: false
+  main:
+    description: "When using git diff sourcing, diff against this branch"
+    default: "main"
   configFile:
     description: "A JSON file in the repo used to configure the link check"
   diff:

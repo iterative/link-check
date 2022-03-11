@@ -4,7 +4,7 @@ Want to ensure that all the links in your git-based website are alive? This
 project may help!
 
 This script searches through the source file content of either a directory or a
-git branch's difference from master. This means it's possible to both verify the
+git branch's difference from main. This means it's possible to both verify the
 life of every link in the repo and perform much smaller checks on branches to
 quickly ensure all new links are valid.
 
@@ -73,7 +73,7 @@ jobs:
 
       - name: Run the link check script
         id: check
-        uses: "iterative/link-check.action@master"
+        uses: "iterative/link-check.action@main"
         with:
           configFile: "./config/link-check/config.json"
           rootURL: "${{ github.event.deployment.payload.web_url }}"
@@ -137,11 +137,11 @@ useful for sharing patterns between the two.
 ### diff: boolean
 
 When true, uses the output of a git diff between the current working area and
-origin/master as input, as opposed to the default behavior of reading the
+origin/main as input, as opposed to the default behavior of reading the
 filesystem.
-It effectively means that this mode checks links that would be new to master if
+It effectively means that this mode checks links that would be new to main if
 the current state of the program were merged, and that this will provide no
-links when checking out an up-to-date master.
+links when checking out an up-to-date main.
 
 ### rootURL: string
 
@@ -250,7 +250,7 @@ Options:
   -c, --configFile <path>               Path to the configuration file
   -r, --rootURL <url>                   Check root-relative links relative to this URL
   -o, --output <strategy[,strategy]>    Use one or more strategies to generate report output
-  -d, --diff                            Use git diff from origin/master as a source instead of the whole filesystem.
+  -d, --diff                            Use git diff from origin/main as a source instead of the whole filesystem.
   --dryRun                              Skip checking parsed links and report them as skipped
   -u, --unusedPatternsOnly              Do a dry run and exit after printing unused patterns
   -f, --failsOnly                       Only report failing links

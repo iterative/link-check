@@ -31,8 +31,8 @@ const optionsFromFlags: () => Promise<LinkCheckOptions> = async () => {
       commaSeparatedList
     )
     .option(
-      "-d, --diff",
-      "Use git diff from origin/master as a source instead of the whole filesystem."
+      "-d, --diff [main]",
+      "Use git diff against the specified branch (main by default) as a source instead of the whole filesystem."
     )
     .option("--dryRun", "Skip checking parsed links and report them as skipped")
     .option(
@@ -83,7 +83,7 @@ const optionsFromFlags: () => Promise<LinkCheckOptions> = async () => {
   } = program;
 
   const argsOptions = {
-    diff,
+    diff: diff === true ? "main" : diff,
     rootURL,
     fileIncludePatterns,
     fileExcludePatterns,

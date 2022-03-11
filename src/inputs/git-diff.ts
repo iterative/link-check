@@ -19,9 +19,8 @@ const shellPromise = (command: string): Promise<string> =>
     )
   );
 
-const getGitDiffPatchText: () => Promise<string> = async (
-  ancestor = "origin/master"
-) => {
+const getGitDiffPatchText = async (mainBranch = "main"): Promise<string> => {
+  const ancestor = `origin/${mainBranch}`;
   try {
     return shellPromise(`git diff -U0 --minimal ${ancestor}...HEAD`);
   } catch (e) {
@@ -46,11 +45,12 @@ const getFileContentEntries: (
   fileIncludePatterns,
   fileExcludePatterns,
   origin,
+  diff,
 }) => {
   if (origin) {
     await setGitOrigin(origin);
   }
-  const splitPatchText = (await getGitDiffPatchText()).split(
+  const splitPatchText = (await getGitDiffPatchText(diff as string)).split(
     /^diff --git.* b\/(.*)\n(?:.*\n){4}/gm
   );
 
