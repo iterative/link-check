@@ -27,10 +27,20 @@ const bottleneckedFetch: (
   url: URL,
   fetchOptions: { method: string },
   options: LinkCheckOptions
-) => Promise<Response> = async (url, fetchOptions, options) =>
-  getBottleneck(url.hostname, options).schedule(() =>
-    fetch(url.href, fetchOptions)
+) => Promise<Response> = async (url, fetchOptions, options) => {
+  const {
+    userAgent = "Mozilla/5.0 (compatible; Iterative/link-check; +https://github.com/iterative/link-check)",
+  } = options;
+
+  return getBottleneck(url.hostname, options).schedule(() =>
+    fetch(url.href, {
+      ...fetchOptions,
+      headers: {
+        "user-agent": userAgent,
+      },
+    })
   );
+};
 
 const fetchWithRetries = async (
   url: URL,

@@ -62,6 +62,7 @@ async function optionsFromCoreInputs() {
     "fileIncludePatterns",
     "fileExcludePatternFile",
     "fileExcludePatterns",
+    "userAgent",
     "output",
     "failsOnly",
     "verbose",

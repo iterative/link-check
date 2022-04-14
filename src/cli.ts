@@ -61,6 +61,7 @@ const optionsFromFlags: () => Promise<LinkCheckOptions> = async () => {
       "Add a micromatch pattern used to exclude files to scrape links from",
       collect
     )
+    .option("-ua, --userAgent <string>", "Use a custom user agent for requests")
     .on("--help", () => {
       console.log(
         "\nTo specify multiple patterns, use the relevant flag multiple times."
@@ -80,6 +81,7 @@ const optionsFromFlags: () => Promise<LinkCheckOptions> = async () => {
     dryRun = unusedPatternsOnly,
     failsOnly,
     verbose,
+    userAgent,
   } = program;
 
   const argsOptions = {
@@ -93,6 +95,7 @@ const optionsFromFlags: () => Promise<LinkCheckOptions> = async () => {
     verbose,
     dryRun,
     failsOnly,
+    userAgent,
   };
 
   const fileOptions = await parseFile(configFile);

@@ -218,6 +218,12 @@ The minimum amount of time in ms to wait before two requests on one domain. Defa
 
 The maximum amount of requests allowed on each hostname at one time. Defaults to 1.
 
+### userAgent: string
+
+When specified, will use this string as the `user-agent` header in link check requests.
+
+Defaults to `Mozilla/5.0 (compatible; Iterative/link-check; +https://github.com/iterative/link-check)`
+
 ### linkOptions: Map<string, options>
 
 This object determines settings that will be applied for each hostname. The keys
