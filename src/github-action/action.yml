@@ -62,6 +62,10 @@ inputs:
       A string or JSON array of micromatch patterns to blacklist files.
       Takes priority over inclusion patterns.
     required: false
+  userAgent:
+    description: >-
+      When specified, will use this string as the `user-agent` header in link check requests.
+      Defaults to `Mozilla/5.0 (compatible; Iterative/link-check; +https://github.com/iterative/link-check)`
   output:
     description: >-
       A string or JSON array of output methods to use. "consoleLog" and
