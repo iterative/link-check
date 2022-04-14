@@ -35,6 +35,7 @@ export interface LinkCheckOptions extends CoreLinkCheckOptions {
   output?: string[];
   failsOnly?: boolean;
   origin?: string;
+  userAgent?: string;
 }
 
 export interface UnresolvedLinkCheckOptions extends CoreLinkCheckOptions {
