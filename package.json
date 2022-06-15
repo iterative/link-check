@@ -46,6 +46,7 @@
   "dependencies": {
     "bottleneck": "^2.19.5",
     "commander": "^6.1.0",
+    "execa": "^6.1.0",
     "fast-glob": "^3.2.4",
     "js-yaml": "^3.14.0",
     "lodash": "^4.17.20",

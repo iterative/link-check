@@ -1,28 +1,11 @@
-import { exec } from "child_process";
+import { execa } from "execa";
 import mm from "micromatch";
 import { FileContentEntry, LinkCheckOptions } from "../types";
-
-const shellPromise = (command: string): Promise<string> =>
-  new Promise((resolve, reject) =>
-    exec(command, (error, stdout, stderr) =>
-      error
-        ? reject(
-            new Error(
-              JSON.stringify({
-                error,
-                stdout,
-                stderr,
-              })
-            )
-          )
-        : resolve(stdout)
-    )
-  );
 
 const getGitDiffPatchText = async (mainBranch = "main"): Promise<string> => {
   const ancestor = `origin/${mainBranch}`;
   try {
-    return shellPromise(`git diff -U0 --minimal ${ancestor}...HEAD`);
+    return execa("git", ["diff", "-U0", "--minimal", ancestor]);
   } catch (e) {
     throw new Error(
       `There was an error trying to get a diff between ${ancestor} and HEAD! (${e})`
@@ -32,8 +15,8 @@ const getGitDiffPatchText = async (mainBranch = "main"): Promise<string> => {
 
 const setGitOrigin: (origin: string) => Promise<void> = async (origin) => {
   try {
-    await shellPromise("git remote remove origin");
-    await shellPromise(`git remote add origin ${origin}`);
+    await execa("git", ["remote", "remove", "origin"]);
+    await execa(`git`, ["remote", "add", "origin", origin]);
   } catch (e) {
     throw new Error(`There was an error switching origin to ${origin}!`);
   }

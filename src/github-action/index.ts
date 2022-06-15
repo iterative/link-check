@@ -1,6 +1,6 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import * as core from "@actions/core";
-import { exec } from "child_process";
+import { execa } from "execa";
 import getContentEntries from "../inputs";
 import { checkFileEntries } from "../checkFileEntries";
 import useOutputs from "../outputs/useOutputs";
@@ -88,11 +88,11 @@ async function main() {
   if (options.verbose) console.log("Options:", options);
 
   if (options.diff)
-    await new Promise<void>((resolve, reject) => {
-      exec(`git fetch origin ${options.diff}`, (err) =>
-        err ? reject(err) : resolve()
-      );
-    });
+    await execa(`git`, [
+      "fetch",
+      "origin",
+      options.diff === true ? "main" : options.diff,
+    ]);
 
   const fileEntries = await getContentEntries(options);
   const report = await checkFileEntries(fileEntries, options);
