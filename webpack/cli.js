@@ -12,8 +12,6 @@ const cliConfig = {
       raw: true,
     }),
   ],
-  externals: ({ request }, cb) =>
-    /^\.+/.test(request) ? cb() : cb(null, `commonjs ${request}`),
   output: {
     filename: "cli.js",
   },

@@ -33,7 +33,7 @@ export async function parseFile<T = Partial<UnresolvedLinkCheckOptions>>(
     case ".yaml":
       return transformFileContents<T>(
         filePath,
-        (data) => (yaml.safeLoad(String(data)) as unknown) as T
+        (data) => yaml.load(String(data)) as unknown as T
       );
     case ".json":
       return transformFileContents<T>(filePath, (data: Buffer) =>
@@ -118,7 +118,7 @@ export async function mergeAndResolveOptions(
     [fileExcludePatternFile, fileExcludePatterns],
   ]);
 
-  return ({
+  return {
     ...rest,
     diff: diff === true ? "main" : diff,
     linkOptions,
@@ -130,5 +130,5 @@ export async function mergeAndResolveOptions(
     linkExcludePatterns: resolvedLinkExcludePatterns,
     fileIncludePatterns: patternsOrGlobstar(resolvedFileIncludePatterns),
     fileExcludePatterns: resolvedFileExcludePatterns,
-  } as unknown) as LinkCheckOptions;
+  } as unknown as LinkCheckOptions;
 }

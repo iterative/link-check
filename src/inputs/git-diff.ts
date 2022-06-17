@@ -5,7 +5,13 @@ import { FileContentEntry, LinkCheckOptions } from "../types";
 const getGitDiffPatchText = async (mainBranch = "main"): Promise<string> => {
   const ancestor = `origin/${mainBranch}`;
   try {
-    return execa("git", ["diff", "-U0", "--minimal", ancestor]);
+    const { stdout } = await execa("git", [
+      "diff",
+      "-U0",
+      "--minimal",
+      ancestor,
+    ]);
+    return stdout;
   } catch (e) {
     throw new Error(
       `There was an error trying to get a diff between ${ancestor} and HEAD! (${e})`
