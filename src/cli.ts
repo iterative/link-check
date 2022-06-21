@@ -82,7 +82,7 @@ const optionsFromFlags: () => Promise<LinkCheckOptions> = async () => {
     failsOnly,
     verbose,
     userAgent,
-  } = program;
+  } = program.opts();
 
   const argsOptions = {
     diff: diff === true ? "main" : diff,
