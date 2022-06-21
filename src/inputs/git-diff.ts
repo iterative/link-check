@@ -9,7 +9,7 @@ const getGitDiffPatchText = async (mainBranch = "main"): Promise<string> => {
       "diff",
       "-U0",
       "--minimal",
-      ancestor,
+      `${ancestor}...HEAD`,
     ]);
     return stdout;
   } catch (e) {
