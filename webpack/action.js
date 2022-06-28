@@ -5,6 +5,7 @@ const { merge } = require("webpack-merge");
 const common = require("./common");
 
 const actionConfig = {
+  target: "node",
   entry: "./github-action/index.ts",
   plugins: [
     new CopyPlugin({
