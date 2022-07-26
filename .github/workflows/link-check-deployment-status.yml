@@ -3,6 +3,8 @@ on:
   workflow_call:
     inputs:
       main:
+        type: "string"
+        required: false
         description: "The main branch of this repository"
         default: "main"
 jobs:
