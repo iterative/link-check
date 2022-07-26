@@ -11,9 +11,9 @@ import {
 const hostBottlenecks = {};
 const getBottleneck = (hostname: string, options: LinkCheckOptions) => {
   if (!hostBottlenecks[hostname]) {
-    const currentLinkOptionsEntry = Object.entries(
-      options.linkOptions
-    ).find(([pattern]) => mm.isMatch(hostname, pattern));
+    const currentLinkOptionsEntry = Object.entries(options.linkOptions).find(
+      ([pattern]) => mm.isMatch(hostname, pattern)
+    );
     const {
       minTime = options.minTime || 400,
       maxConcurrent = options.maxConcurrent || 1,
@@ -115,13 +115,10 @@ const isMatch = (
   return false;
 };
 
-export const getUnusedLinkExcludePatterns = (
-  allPatterns: string[]
-): string[] => {
-  return allPatterns
+export const getUnusedLinkExcludePatterns = (allPatterns: string[]): string[] =>
+  allPatterns
     ? allPatterns.filter((x: string) => !usedExcludePatterns.has(x))
     : [];
-};
 
 const checkLink: (
   linkDef: LinkCheckArgs,

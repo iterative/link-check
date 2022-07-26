@@ -2,9 +2,26 @@ const webpack = require("webpack");
 const path = require("path");
 const TerserPlugin = require("terser-webpack-plugin");
 const { merge } = require("webpack-merge");
-const common = require("./common");
 
-const cliConfig = {
+module.exports = {
+  context: path.join(__dirname, "src"),
+  mode: "production",
+  target: "node",
+  optimization: {
+    emitOnErrors: true,
+  },
+  module: {
+    rules: [
+      {
+        test: /\.ts$/,
+        use: "ts-loader",
+        exclude: /node_modules/,
+      },
+    ],
+  },
+  resolve: {
+    extensions: [".tsx", ".ts", ".js"],
+  },
   entry: "./cli.ts",
   plugins: [
     new webpack.BannerPlugin({
@@ -15,7 +32,7 @@ const cliConfig = {
   ],
   output: {
     filename: "cli.js",
-    path: path.resolve(__dirname, "..", "dist"),
+    path: path.resolve(__dirname, "dist"),
   },
   optimization: {
     minimizer: [
@@ -30,5 +47,3 @@ const cliConfig = {
     ],
   },
 };
-
-module.exports = merge(common, cliConfig);
