@@ -24,7 +24,7 @@ jobs:
           set +e
           body="$(
             npx repo-link-check \
-            -d ${{ main }} -c config/link-check/config.yml \
+            -d ${{ inputs.main }} -c config/link-check/config.yml \
             -r ${{ github.event.deployment.payload.web_url }}
           )"
           body="${body//'%'/'%25'}"
