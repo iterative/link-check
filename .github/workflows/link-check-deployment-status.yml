@@ -6,7 +6,7 @@ on:
         type: "string"
         required: false
         description: "The branch to compare against when finding new links to check"
-        default: "${{ github.event.deployment.payload.web_url }}"
+        default: "${{ github.event.repository.default_branch }}"
 jobs:
   run:
     name: Run
