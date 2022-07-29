@@ -2,11 +2,11 @@ name: Check new links against deployment
 on:
   workflow_call:
     inputs:
-      main:
+      branch:
         type: "string"
         required: false
-        description: "The main branch of this repository"
-        default: "main"
+        description: "The branch to compare against when finding new links to check"
+        default: "${{ github.event.repository.default_branch }}"
 jobs:
   run:
     name: Run
@@ -24,7 +24,8 @@ jobs:
           set +e
           body="$(
             npx repo-link-check \
-            -d ${{ inputs.main }} -c config/link-check/config.yml \
+            -d ${{ inputs.branch }} \
+            -c config/link-check/config.yml \
             -r ${{ github.event.deployment.payload.web_url }}
           )"
           body="${body//'%'/'%25'}"
