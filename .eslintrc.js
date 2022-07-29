@@ -1,62 +1,62 @@
 module.exports = {
-  parser: "@typescript-eslint/parser",
+  parser: '@typescript-eslint/parser',
   parserOptions: {
-    sourceType: "module",
+    sourceType: 'module'
   },
-  extends: ["airbnb-base", "plugin:@typescript-eslint/recommended", "prettier"],
-  plugins: ["import", "prettier", "@typescript-eslint"],
+  extends: ['airbnb-base', 'plugin:@typescript-eslint/recommended', 'prettier'],
+  plugins: ['import', 'prettier', '@typescript-eslint'],
   env: {
     browser: false,
-    es6: true,
+    es6: true
   },
   rules: {
     // prettier
-    "prettier/prettier": ["error"],
+    'prettier/prettier': ['error'],
     // TypeScript
-    "@typescript-eslint/no-unused-vars": "error",
-    "@typescript-eslint/explicit-member-accessibility": "off",
-    "@typescript-eslint/no-object-literal-type-assertion": "off",
-    "no-console": "off",
+    '@typescript-eslint/no-unused-vars': 'error',
+    '@typescript-eslint/explicit-member-accessibility': 'off',
+    '@typescript-eslint/no-object-literal-type-assertion': 'off',
+    'no-console': 'off',
     // import
-    "import/extensions": [
-      "error",
-      "ignorePackages",
+    'import/extensions': [
+      'error',
+      'ignorePackages',
       {
-        js: "never",
-        mjs: "never",
-        ts: "never",
-      },
-    ],
+        js: 'never',
+        mjs: 'never',
+        ts: 'never'
+      }
+    ]
   },
   settings: {
-    "import/resolver": {
+    'import/resolver': {
       node: {
-        extensions: [".js", ".ts", ".json"],
-      },
+        extensions: ['.js', '.ts', '.json']
+      }
     },
-    "import/extensions": [".js", ".ts", ".mjs"],
+    'import/extensions': ['.js', '.ts', '.mjs']
   },
   overrides: [
     {
-      files: ["webpack/**/*.js"],
+      files: ['webpack/**/*.js'],
       rules: {
-        "@typescript-eslint/no-var-requires": "off",
-        "import/no-extraneous-dependencies": "off",
-      },
+        '@typescript-eslint/no-var-requires': 'off',
+        'import/no-extraneous-dependencies': 'off'
+      }
     },
     {
-      files: ["*.test.js"],
+      files: ['*.test.js'],
       rules: {
-        "no-undef": "off",
-      },
+        'no-undef': 'off'
+      }
     },
     {
-      files: ["**/*.ts"],
+      files: ['**/*.ts'],
       parserOptions: {
-        sourceType: "module",
-        project: "./tsconfig.json",
-      },
-    },
+        sourceType: 'module',
+        project: './tsconfig.json'
+      }
+    }
   ],
-  ignorePatterns: ["/dist/**", "/github-action/**"],
-};
+  ignorePatterns: ['/dist/**', '/github-action/**']
+}

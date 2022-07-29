@@ -1,4 +1,4 @@
-import scrapeLinks from "./scrapeLinks";
+import scrapeLinks from './scrapeLinks'
 
 const markdownString = `
 Markdown sample with a [link to Google](https://www.google.com), one [with a URL path](https://www.google.com/nested/page.html), and others:
@@ -15,7 +15,7 @@ Markdown sample with a [link to Google](https://www.google.com), one [with a URL
   /just/a/path
 
 There's also some blank lines, misc. text, and <span>HTML</span> code.
-`;
+`
 
 const plaintextString = `
 This string is plaintext, with links like https://www.google.com and https://www.google.com/nested/page.html
@@ -24,41 +24,41 @@ I can scrape "https://reddit.com/r/subreddit" and (https://facebook.com) as well
 
 TODO: Unfortunately, gmail.com is just too vague.
 TODO: Ending in a period won't work well either, e.g. www.something.com.
-`;
+`
 
 const markdownTestResult = [
-  "https://www.google.com",
-  "https://www.google.com/nested/page.html",
-  "www.reddit.com",
-  "facebook.com",
-  "https://www.ref.com",
-  "www.links.in/newline",
-  "/just/a/path",
-];
+  'https://www.google.com',
+  'https://www.google.com/nested/page.html',
+  'www.reddit.com',
+  'facebook.com',
+  'https://www.ref.com',
+  'www.links.in/newline',
+  '/just/a/path'
+]
 
 const plaintextTestResult = [
-  "https://www.google.com",
-  "https://www.google.com/nested/page.html",
-  "https://reddit.com/r/subreddit",
-  "https://facebook.com",
-  "www.youtube.com",
-  "www.something.com.",
-];
+  'https://www.google.com',
+  'https://www.google.com/nested/page.html',
+  'https://reddit.com/r/subreddit',
+  'https://facebook.com',
+  'www.youtube.com',
+  'www.something.com.'
+]
 
-test("It scrapes from the markdown test string", () => {
+test('It scrapes from the markdown test string', () => {
   expect(
     scrapeLinks({
-      filePath: "test.md",
-      content: markdownString,
+      filePath: 'test.md',
+      content: markdownString
     })
-  ).toEqual(markdownTestResult);
-});
+  ).toEqual(markdownTestResult)
+})
 
-test("It scrapes absolute links from unrecognized extensions", () => {
+test('It scrapes absolute links from unrecognized extensions', () => {
   expect(
     scrapeLinks({
-      filePath: "test",
-      content: plaintextString,
+      filePath: 'test',
+      content: plaintextString
     })
-  ).toEqual(plaintextTestResult);
-});
+  ).toEqual(plaintextTestResult)
+})

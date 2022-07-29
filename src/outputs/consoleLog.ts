@@ -1,66 +1,66 @@
-import { ChecksReport, LinkCheckOptions } from "../types";
-import formatEntries from "../formatEntries";
-import combineSegments from "./combineSegments";
+import { ChecksReport, LinkCheckOptions } from '../types'
+import formatEntries from '../formatEntries'
+import combineSegments from './combineSegments'
 
 function conclude(outputSegments: string[]): void {
-  console.log(combineSegments(outputSegments));
+  console.log(combineSegments(outputSegments))
 }
 
 function consoleLogReporter(
   report: ChecksReport,
   options: LinkCheckOptions
 ): void {
-  const { diff, unusedPatternsOnly, failsOnly } = options;
+  const { diff, unusedPatternsOnly, failsOnly } = options
   const {
     totalChecksCount,
     failedChecksCount,
     entries,
     failedEntries,
-    unusedPatterns,
-  } = report;
-  const outputSegments = [];
+    unusedPatterns
+  } = report
+  const outputSegments = []
 
-  const outputEntries = failsOnly ? failedEntries : entries;
+  const outputEntries = failsOnly ? failedEntries : entries
 
   if (totalChecksCount === 0) {
-    outputSegments.push("There were no links to check!");
+    outputSegments.push('There were no links to check!')
   } else {
-    const reportBody = formatEntries(outputEntries, { failsOnly });
+    const reportBody = formatEntries(outputEntries, { failsOnly })
 
     if (diff) {
       if (unusedPatternsOnly)
         console.warn(
-          "unusedPatternsOnly and diff are mutually exclusive! Skipping."
-        );
+          'unusedPatternsOnly and diff are mutually exclusive! Skipping.'
+        )
     } else {
       if (unusedPatterns.length > 0) {
         outputSegments.push(
           `Some link ignore patterns were unused!\n\n${unusedPatterns.join(
-            "\n"
+            '\n'
           )}`
-        );
+        )
       }
 
       if (unusedPatternsOnly) {
         if (unusedPatterns.length === 0) {
-          outputSegments.push("All link patterns were used.");
+          outputSegments.push('All link patterns were used.')
         }
-        return conclude(outputSegments);
+        return conclude(outputSegments)
       }
     }
 
-    outputSegments.push(reportBody);
+    outputSegments.push(reportBody)
     if (failedChecksCount > 0) {
       outputSegments.push(
         `${failedChecksCount}/${totalChecksCount} links failed.`
-      );
+      )
     } else {
-      outputSegments.push(`All ${totalChecksCount} links passed!`);
+      outputSegments.push(`All ${totalChecksCount} links passed!`)
     }
   }
 
-  return conclude(outputSegments);
+  return conclude(outputSegments)
 }
 
-export const name = "consoleLog";
-export const reporter = consoleLogReporter;
+export const name = 'consoleLog'
+export const reporter = consoleLogReporter
