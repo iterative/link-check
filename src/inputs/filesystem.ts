@@ -1,14 +1,14 @@
-import glob from "fast-glob";
-import fs from "fs";
-import { FileContentEntry, LinkCheckOptions } from "../types";
+import glob from 'fast-glob'
+import fs from 'fs'
+import { FileContentEntry, LinkCheckOptions } from '../types'
 
 async function contentFromFilesystem({
   fileIncludePatterns,
-  fileExcludePatterns,
+  fileExcludePatterns
 }: LinkCheckOptions): Promise<FileContentEntry[]> {
   const filePaths = await glob(fileIncludePatterns, {
-    ignore: fileExcludePatterns,
-  });
+    ignore: fileExcludePatterns
+  })
   return filePaths.map(
     (filePath: string) =>
       ({
@@ -18,9 +18,9 @@ async function contentFromFilesystem({
             fs.readFile(filePathArg, (err, buffer) =>
               err ? reject(err) : resolve(String(buffer))
             )
-          ),
+          )
       } as FileContentEntry)
-  );
+  )
 }
 
-export default contentFromFilesystem;
+export default contentFromFilesystem

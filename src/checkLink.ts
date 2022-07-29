@@ -1,27 +1,27 @@
-import fetch from "node-fetch";
-import mm from "micromatch";
-import Bottleneck from "bottleneck";
+import fetch from 'node-fetch'
+import mm from 'micromatch'
+import Bottleneck from 'bottleneck'
 import {
   LinkCheckArgs,
   LinkCheckOptions,
   CheckedLink,
-  LinkOptions,
-} from "./types";
+  LinkOptions
+} from './types'
 
-const hostBottlenecks = {};
+const hostBottlenecks = {}
 const getBottleneck = (hostname: string, options: LinkCheckOptions) => {
   if (!hostBottlenecks[hostname]) {
     const currentLinkOptionsEntry = Object.entries(options.linkOptions).find(
       ([pattern]) => mm.isMatch(hostname, pattern)
-    );
+    )
     const {
       minTime = options.minTime || 400,
-      maxConcurrent = options.maxConcurrent || 1,
-    }: LinkOptions = currentLinkOptionsEntry ? currentLinkOptionsEntry[1] : {};
-    hostBottlenecks[hostname] = new Bottleneck({ minTime, maxConcurrent });
+      maxConcurrent = options.maxConcurrent || 1
+    }: LinkOptions = currentLinkOptionsEntry ? currentLinkOptionsEntry[1] : {}
+    hostBottlenecks[hostname] = new Bottleneck({ minTime, maxConcurrent })
   }
-  return hostBottlenecks[hostname];
-};
+  return hostBottlenecks[hostname]
+}
 
 const bottleneckedFetch: (
   url: URL,
@@ -29,37 +29,37 @@ const bottleneckedFetch: (
   options: LinkCheckOptions
 ) => Promise<Response> = async (url, fetchOptions, options) => {
   const {
-    userAgent = "Mozilla/5.0 (compatible; Iterative/link-check; +https://github.com/iterative/link-check)",
-  } = options;
+    userAgent = 'Mozilla/5.0 (compatible; Iterative/link-check; +https://github.com/iterative/link-check)'
+  } = options
 
   return getBottleneck(url.hostname, options).schedule(() =>
     fetch(url.href, {
       ...fetchOptions,
       headers: {
-        "user-agent": userAgent,
-      },
+        'user-agent': userAgent
+      }
     })
-  );
-};
+  )
+}
 
 const fetchWithRetries = async (
   url: URL,
   fetchOptions: { retries?: number } = {},
   options: LinkCheckOptions
 ) => {
-  const { retries = 0 } = fetchOptions;
-  const { maxRetries = 3 } = options;
+  const { retries = 0 } = fetchOptions
+  const { maxRetries = 3 } = options
   const res = await bottleneckedFetch(
     url,
-    { ...fetchOptions, method: "HEAD" },
+    { ...fetchOptions, method: 'HEAD' },
     options
-  );
+  )
 
   if (res.status === 429 && retries < maxRetries) {
-    const retryAfter = res.headers.get("retry-after");
+    const retryAfter = res.headers.get('retry-after')
     if (retryAfter) {
-      const retryMs = Number(retryAfter) * 1000;
-      return new Promise((resolve) => {
+      const retryMs = Number(retryAfter) * 1000
+      return new Promise(resolve => {
         setTimeout(async () => {
           resolve(
             await fetchWithRetries(
@@ -67,29 +67,29 @@ const fetchWithRetries = async (
               { ...fetchOptions, retries: retries + 1 },
               options
             )
-          );
-        }, retryMs);
-      });
+          )
+        }, retryMs)
+      })
     }
   } else if (!res.ok) {
-    return bottleneckedFetch(url, { ...fetchOptions, method: "GET" }, options);
+    return bottleneckedFetch(url, { ...fetchOptions, method: 'GET' }, options)
   }
 
-  return res;
-};
+  return res
+}
 
-const memo = {};
+const memo = {}
 const memoizedFetch = async (url: URL, options: LinkCheckOptions) => {
-  const { href } = url;
-  const existing = memo[href];
+  const { href } = url
+  const existing = memo[href]
   if (existing) {
-    return existing;
+    return existing
   }
-  memo[href] = fetchWithRetries(url, {}, options);
-  return memo[href];
-};
+  memo[href] = fetchWithRetries(url, {}, options)
+  return memo[href]
+}
 
-const usedExcludePatterns: Set<string> = new Set();
+const usedExcludePatterns: Set<string> = new Set()
 const isMatch = (
   link: string,
   includePatterns: string | string[],
@@ -98,84 +98,84 @@ const isMatch = (
   if (mm.isMatch(link, includePatterns, options)) {
     if (excludePatterns) {
       if (Array.isArray(excludePatterns)) {
-        const excludingPattern = excludePatterns.find((excludePattern) =>
+        const excludingPattern = excludePatterns.find(excludePattern =>
           mm.isMatch(link, excludePattern, options)
-        );
+        )
         if (excludingPattern) {
-          usedExcludePatterns.add(excludingPattern);
-          return false;
+          usedExcludePatterns.add(excludingPattern)
+          return false
         }
       } else if (mm.isMatch(link, excludePatterns, options)) {
-        usedExcludePatterns.add(excludePatterns);
-        return false;
+        usedExcludePatterns.add(excludePatterns)
+        return false
       }
     }
-    return true;
+    return true
   }
-  return false;
-};
+  return false
+}
 
 export const getUnusedLinkExcludePatterns = (allPatterns: string[]): string[] =>
   allPatterns
     ? allPatterns.filter((x: string) => !usedExcludePatterns.has(x))
-    : [];
+    : []
 
 const checkLink: (
   linkDef: LinkCheckArgs,
   options: LinkCheckOptions
 ) => Promise<CheckedLink> = async ({ link, url }, options) => {
-  const { linkIncludePatterns, linkExcludePatterns, dryRun } = options;
+  const { linkIncludePatterns, linkExcludePatterns, dryRun } = options
   if (
     isMatch(link, linkIncludePatterns, {
       ignore: linkExcludePatterns,
-      bash: true,
+      bash: true
     })
   ) {
-    const { href } = url;
+    const { href } = url
     if (dryRun) {
       return {
         link,
         href: link === href ? null : href,
-        description: "Skipped because of dry-run",
-        pass: true,
-      };
+        description: 'Skipped because of dry-run',
+        pass: true
+      }
     }
     try {
-      const { status, ok } = await memoizedFetch(url, options);
+      const { status, ok } = await memoizedFetch(url, options)
       return {
         link,
         // omit href if it and link are the exact same
         href: link === href ? null : href,
         description: status,
-        pass: ok,
-      };
+        pass: ok
+      }
     } catch (e) {
       const checkedLink: Partial<CheckedLink> = {
         link,
         href,
-        pass: false,
-      };
+        pass: false
+      }
       switch (e.code) {
-        case "ENOTFOUND":
-          checkedLink.description = "Site not found";
-          break;
+        case 'ENOTFOUND':
+          checkedLink.description = 'Site not found'
+          break
         default:
           checkedLink.description = [
-            e.code || "Fetch Error",
-            e.message && `: ${e.message}`,
+            e.code || 'Fetch Error',
+            e.message && `: ${e.message}`
           ]
             .filter(Boolean)
-            .join("");
+            .join('')
       }
-      return checkedLink as CheckedLink;
+      return checkedLink as CheckedLink
     }
   } else {
     return {
       link,
-      description: "Excluded",
-      pass: true,
-    };
+      description: 'Excluded',
+      pass: true
+    }
   }
-};
+}
 
-export default checkLink;
+export default checkLink
