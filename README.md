@@ -23,4 +23,7 @@ For example:
     "link-check-exclude": "repo-link-check -c config/link-check/config.yml -s filesystem -u only"
 ```
 
-This setup checks all files in the project-relative directory `/content` with `.css`, `.md`, and `.json` extensions for links, resolve root-relative links to be relative to `https://www.example.com` and excluding files based on the lines in `.config/exclude-files` and `.config.exclude-links`
+This setup checks all files in the project-relative directory `/content` with
+`.css`, `.md`, and `.json` extensions for links, resolve root-relative links to
+be relative to `https://www.example.com` and excluding files based on the lines
+in `.config/exclude-files` and `.config.exclude-links`

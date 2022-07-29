@@ -3,8 +3,8 @@ on:
   workflow_call:
     inputs:
       config:
-        description: "The path to the link-check config file"
-        default: "config/link-check/config.yml"
+        description: 'The path to the link-check config file'
+        default: 'config/link-check/config.yml'
 jobs:
   run:
     name: Link Check All

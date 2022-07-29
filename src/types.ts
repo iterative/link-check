@@ -1,77 +1,77 @@
 export interface FileEntry {
-  filePath: string;
+  filePath: string
 }
 
 export interface StringFilter {
-  (subject: string): boolean;
+  (subject: string): boolean
 }
 
 export interface FileContentEntry extends FileEntry {
-  content: string | ((filePath?: string) => string | Promise<string>);
+  content: string | ((filePath?: string) => string | Promise<string>)
 }
 
 export interface FileChecksEntry extends FileEntry {
-  checks: CheckedLink[];
+  checks: CheckedLink[]
 }
 
 interface CoreLinkCheckOptions {
-  diff?: boolean | string;
-  rootURL?: string;
-  unusedPatternsOnly?: boolean;
-  dryRun?: boolean;
-  verbose?: boolean;
-  linkOptions?: Map<string, LinkOptions>;
-  failOnUnusedPatterns?: boolean;
-  minTime?: number;
-  maxConcurrent?: number;
-  maxRetries?: number;
+  diff?: boolean | string
+  rootURL?: string
+  unusedPatternsOnly?: boolean
+  dryRun?: boolean
+  verbose?: boolean
+  linkOptions?: Map<string, LinkOptions>
+  failOnUnusedPatterns?: boolean
+  minTime?: number
+  maxConcurrent?: number
+  maxRetries?: number
 }
 
 export interface LinkCheckOptions extends CoreLinkCheckOptions {
-  linkIncludePatterns?: string[];
-  linkExcludePatterns?: string[];
-  fileIncludePatterns?: string[];
-  fileExcludePatterns?: string[];
-  output?: string[];
-  failsOnly?: boolean;
-  origin?: string;
-  userAgent?: string;
+  linkIncludePatterns?: string[]
+  linkExcludePatterns?: string[]
+  fileIncludePatterns?: string[]
+  fileExcludePatterns?: string[]
+  output?: string[]
+  failsOnly?: boolean
+  origin?: string
+  userAgent?: string
 }
 
 export interface UnresolvedLinkCheckOptions extends CoreLinkCheckOptions {
-  linkIncludePatterns?: string | string[];
-  linkExcludePatterns?: string | string[];
-  fileIncludePatterns?: string | string[];
-  fileExcludePatterns?: string | string[];
-  linkIncludePatternFile?: string;
-  linkExcludePatternFile?: string;
-  fileIncludePatternFile?: string;
-  fileExcludePatternFile?: string;
-  output?: string[] | string;
-  failsOnly?: boolean | "false";
+  linkIncludePatterns?: string | string[]
+  linkExcludePatterns?: string | string[]
+  fileIncludePatterns?: string | string[]
+  fileExcludePatterns?: string | string[]
+  linkIncludePatternFile?: string
+  linkExcludePatternFile?: string
+  fileIncludePatternFile?: string
+  fileExcludePatternFile?: string
+  output?: string[] | string
+  failsOnly?: boolean | 'false'
 }
 
 export interface LinkCheckArgs {
-  link: string;
-  url: URL;
+  link: string
+  url: URL
 }
 
 export interface CheckedLink {
-  link: string;
-  pass: boolean;
-  description?: string;
-  href?: string;
+  link: string
+  pass: boolean
+  description?: string
+  href?: string
 }
 
 export interface LinkOptions {
-  minTime?: number;
-  maxConcurrent?: number;
+  minTime?: number
+  maxConcurrent?: number
 }
 
 export interface ChecksReport {
-  entries: FileChecksEntry[];
-  totalChecksCount: number;
-  failedEntries: FileChecksEntry[];
-  failedChecksCount: number;
-  unusedPatterns: string[];
+  entries: FileChecksEntry[]
+  totalChecksCount: number
+  failedEntries: FileChecksEntry[]
+  failedChecksCount: number
+  unusedPatterns: string[]
 }

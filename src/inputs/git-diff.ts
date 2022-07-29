@@ -1,32 +1,32 @@
-import { execa } from "execa";
-import mm from "micromatch";
-import { FileContentEntry, LinkCheckOptions } from "../types";
+import { execa } from 'execa'
+import mm from 'micromatch'
+import { FileContentEntry, LinkCheckOptions } from '../types'
 
-const getGitDiffPatchText = async (mainBranch = "main"): Promise<string> => {
-  const ancestor = `origin/${mainBranch}`;
+const getGitDiffPatchText = async (mainBranch = 'main'): Promise<string> => {
+  const ancestor = `origin/${mainBranch}`
   try {
-    const { stdout } = await execa("git", [
-      "diff",
-      "-U0",
-      "--minimal",
-      `${ancestor}...HEAD`,
-    ]);
-    return stdout;
+    const { stdout } = await execa('git', [
+      'diff',
+      '-U0',
+      '--minimal',
+      `${ancestor}...HEAD`
+    ])
+    return stdout
   } catch (e) {
     throw new Error(
       `There was an error trying to get a diff between ${ancestor} and HEAD! (${e})`
-    );
+    )
   }
-};
+}
 
-const setGitOrigin: (origin: string) => Promise<void> = async (origin) => {
+const setGitOrigin: (origin: string) => Promise<void> = async origin => {
   try {
-    await execa("git", ["remote", "remove", "origin"]);
-    await execa(`git`, ["remote", "add", "origin", origin]);
+    await execa('git', ['remote', 'remove', 'origin'])
+    await execa(`git`, ['remote', 'add', 'origin', origin])
   } catch (e) {
-    throw new Error(`There was an error switching origin to ${origin}!`);
+    throw new Error(`There was an error switching origin to ${origin}!`)
   }
-};
+}
 
 const getFileContentEntries: (
   options: LinkCheckOptions
@@ -34,37 +34,37 @@ const getFileContentEntries: (
   fileIncludePatterns,
   fileExcludePatterns,
   origin,
-  diff,
+  diff
 }) => {
   if (origin) {
-    await setGitOrigin(origin);
+    await setGitOrigin(origin)
   }
   const splitPatchText = (await getGitDiffPatchText(diff as string)).split(
     /^diff --git.* b\/(.*)\n(?:.*\n){4}/gm
-  );
+  )
 
-  const processedOutputs: FileContentEntry[] = [];
+  const processedOutputs: FileContentEntry[] = []
   for (let i = 1; i < splitPatchText.length; i += 2) {
-    const filePath = splitPatchText[i];
+    const filePath = splitPatchText[i]
     if (
       mm.isMatch(filePath, fileIncludePatterns, { ignore: fileExcludePatterns })
     ) {
       const content = splitPatchText[i + 1]
-        .split("\n")
-        .filter((line) => line.startsWith("+"))
-        .map((line) => line.slice(1))
-        .join("\n");
+        .split('\n')
+        .filter(line => line.startsWith('+'))
+        .map(line => line.slice(1))
+        .join('\n')
 
       if (content.length > 0) {
         processedOutputs.push({
           filePath,
-          content,
-        });
+          content
+        })
       }
     }
   }
 
-  return processedOutputs;
-};
+  return processedOutputs
+}
 
-export default getFileContentEntries;
+export default getFileContentEntries

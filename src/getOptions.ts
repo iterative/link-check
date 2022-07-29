@@ -1,70 +1,70 @@
-import defaults from "lodash/defaults";
-import path from "path";
-import yaml from "js-yaml";
-import { UnresolvedLinkCheckOptions, LinkCheckOptions } from "./types";
-import { transformFileContents, asyncMap } from "./util";
+import defaults from 'lodash/defaults'
+import path from 'path'
+import yaml from 'js-yaml'
+import { UnresolvedLinkCheckOptions, LinkCheckOptions } from './types'
+import { transformFileContents, asyncMap } from './util'
 
 type FilePatternsEntry = [
   string | string[] | undefined,
   string | string[] | undefined
-];
+]
 
 const patternsOrGlobstar = (
   patterns: string | string[] | undefined
 ): string | string[] => {
   if (patterns) {
     if (Array.isArray(patterns)) {
-      if (patterns.length > 0) return patterns;
+      if (patterns.length > 0) return patterns
     } else {
-      return patterns;
+      return patterns
     }
   }
-  return "**";
-};
+  return '**'
+}
 
 export async function parseFile<T = Partial<UnresolvedLinkCheckOptions>>(
   filePath?: string
 ): Promise<T | null> {
-  if (!filePath) return null;
+  if (!filePath) return null
 
-  const extension = path.extname(filePath);
+  const extension = path.extname(filePath)
   switch (extension) {
-    case ".yml":
-    case ".yaml":
+    case '.yml':
+    case '.yaml':
       return transformFileContents<T>(
         filePath,
-        (data) => yaml.load(String(data)) as unknown as T
-      );
-    case ".json":
+        data => yaml.load(String(data)) as unknown as T
+      )
+    case '.json':
       return transformFileContents<T>(filePath, (data: Buffer) =>
         JSON.parse(String(data))
-      );
+      )
     default:
       throw new Error(
         `Options file "${filePath}" has unrecognized extension "${extension}"`
-      );
+      )
   }
 }
 
 async function readFileArray(filePath: string): Promise<string[]> {
-  const lines = await parseFile<string[]>(filePath);
+  const lines = await parseFile<string[]>(filePath)
   if (!Array.isArray(lines)) {
     throw new Error(
       `File "${filePath}" is expected to be an Array, but was a ${typeof lines}!`
-    );
+    )
   }
-  return lines;
+  return lines
 }
 
 async function combineFileArrays(
   filePaths: string[] | string | undefined
 ): Promise<string[]> {
-  if (!filePaths) return [];
+  if (!filePaths) return []
   return Array.isArray(filePaths)
     ? ([] as string[]).concat(
         ...(await asyncMap<string, string[]>(filePaths, readFileArray))
       )
-    : readFileArray(filePaths);
+    : readFileArray(filePaths)
 }
 
 export default async function patternsFromFiles(
@@ -73,12 +73,12 @@ export default async function patternsFromFiles(
   return asyncMap<FilePatternsEntry, string[]>(
     entries,
     async ([filenames, patterns]) => {
-      const filePatterns = await combineFileArrays(filenames);
+      const filePatterns = await combineFileArrays(filenames)
       return (patterns ? filePatterns.concat(patterns) : filePatterns).filter(
         Boolean
-      );
+      )
     }
-  );
+  )
 }
 
 export async function mergeAndResolveOptions(
@@ -87,7 +87,7 @@ export async function mergeAndResolveOptions(
   const mergedOptions: UnresolvedLinkCheckOptions = defaults(
     {},
     ...configs.filter(Boolean)
-  );
+  )
   const {
     diff = false,
     fileIncludePatterns,
@@ -104,23 +104,23 @@ export async function mergeAndResolveOptions(
     linkOptions = {},
     output,
     ...rest
-  } = mergedOptions;
+  } = mergedOptions
 
   const [
     resolvedLinkIncludePatterns,
     resolvedLinkExcludePatterns,
     resolvedFileIncludePatterns,
-    resolvedFileExcludePatterns,
+    resolvedFileExcludePatterns
   ] = await patternsFromFiles([
     [linkIncludePatternFile, linkIncludePatterns],
     [linkExcludePatternFile, linkExcludePatterns],
     [fileIncludePatternFile, fileIncludePatterns],
-    [fileExcludePatternFile, fileExcludePatterns],
-  ]);
+    [fileExcludePatternFile, fileExcludePatterns]
+  ])
 
   return {
     ...rest,
-    diff: diff === true ? "main" : diff,
+    diff: diff === true ? 'main' : diff,
     linkOptions,
     unusedPatternsOnly,
     dryRun,
@@ -129,6 +129,6 @@ export async function mergeAndResolveOptions(
     linkIncludePatterns: patternsOrGlobstar(resolvedLinkIncludePatterns),
     linkExcludePatterns: resolvedLinkExcludePatterns,
     fileIncludePatterns: patternsOrGlobstar(resolvedFileIncludePatterns),
-    fileExcludePatterns: resolvedFileExcludePatterns,
-  } as unknown as LinkCheckOptions;
+    fileExcludePatterns: resolvedFileExcludePatterns
+  } as unknown as LinkCheckOptions
 }

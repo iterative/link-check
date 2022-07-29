@@ -3,10 +3,10 @@ on:
   workflow_call:
     inputs:
       main:
-        type: "string"
+        type: 'string'
         required: false
-        description: "The main branch of this repository"
-        default: "main"
+        description: 'The main branch of this repository'
+        default: 'main'
 jobs:
   run:
     name: Run
