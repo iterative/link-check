@@ -37,16 +37,22 @@ workflows that use the CLI version of `link-check` to generate a report. Check
 them out in
 [.github/workflows](https://github.com/iterative/link-check/tree/master/.github/workflows)
 
-## Options
+## Configuration
 
-### configFile: string
+This application is configured primarily through a configuration file whose path
+is specified with the `--configFile` (or `-c`) option. Other options that
+override the file can be specified with flags.
+
+### Options
+
+#### configFile: string
 
 When set by a runner, Link Check will read this path relative to the root of the
 repo for a configuration file, either in JSON or YAML depending on the
 extension. Both the CLI and GHA runners can do this, which is particularly
 useful for sharing patterns between the two.
 
-### diff: boolean
+#### diff: boolean
 
 When true, uses the output of a git diff between the current working area and
 origin/main as input, as opposed to the default behavior of reading the
@@ -54,18 +60,18 @@ filesystem. It effectively means that this mode checks links that would be new
 to main if the current state of the program were merged, and that this will
 provide no links when checking out an up-to-date main.
 
-### rootURL: string
+#### rootURL: string
 
 This string is used as the base for root-relative links (those that start with
 '/'). It's useful for specifying a deploy preview or local server, particularly
 from GitHub Actions.
 
-### linkIncludePatterns: string[]?
+#### linkIncludePatterns: string[]?
 
 When provided, links to check will be limited to those that pass a `micromatch`
 test with this option as the pattern. Otherwise, all links will be used.
 
-### linkExcludePatterns: string[]?
+#### linkExcludePatterns: string[]?
 
 When provided, links that pass a `micromatch` test with this option as the
 pattern will show up on the report, passing with no test necessary and marked as
@@ -73,65 +79,65 @@ excluded.
 
 Exclusions take precedence over inclusions.
 
-### fileIncludePatterns: string[]?
+#### fileIncludePatterns: string[]?
 
 When provided, files to check links in will be limited to those whose filenames
 that pass a `micromatch` test with this option as the pattern. Otherwise, all
 files from the content source will be used.
 
-### fileExcludePatterns: string[]?
+#### fileExcludePatterns: string[]?
 
 When provided, files whose filenames match a `micromatch` check with this option
 as its pattern will be completely excluded from checks and reports.
 
 Exclusions take precedence over inclusions.
 
-### <file|link><Include|Exclude>PatternFile: string?
+#### <file|link><Include|Exclude>PatternFile: string?
 
 These four sister options mirror the `Patterns` variants, but instead take paths
 to files which are top-level arrays in YAML or JSON. These parsed arrays will be
 used alongside ones provided in the related `Patterns` options.
 
-### dryRun: boolean
+#### dryRun: boolean
 
 When this option is true, no link checks will actually be run. Useful for
 debugging link patterns, as excluded links will have a description distinct from
 those stopped by the dry run alone.
 
-### unusedPatternsOnly: boolean
+#### unusedPatternsOnly: boolean
 
 If true, Link Check will use `dryRun`, report unused patterns, and then exit.
 
-### output: (string | string[])?
+#### output: (string | string[])?
 
 Selects the output strategy to use. Both runners can use "consoleLog", and the
 GitHub Action has a "checksAction" mode to generate output for
 `LouisBRunner/checks-action`. Can accept multiple strings to use multiple output
 strategies.
 
-### failsOnly: boolean
+#### failsOnly: boolean
 
 When true, only log/report failed link checks. Useful to get around GitHub
 Actions' character limit.
 
 Disabled by default on CLI, enabled by default on GitHub Actions.
 
-### verbose: boolean
+#### verbose: boolean
 
 When true, the application will `console.log` the parsed options object before
 running.
 
-### minTime: number
+#### minTime: number
 
 The minimum amount of time in ms to wait before two requests on one domain.
 Defaults to 400.
 
-### maxConcurrent: number
+#### maxConcurrent: number
 
 The maximum amount of requests allowed on each hostname at one time. Defaults
 to 1.
 
-### userAgent: string
+#### userAgent: string
 
 When specified, will use this string as the `user-agent` header in link check
 requests.
@@ -139,7 +145,7 @@ requests.
 Defaults to
 `Mozilla/5.0 (compatible; Iterative/link-check; +https://github.com/iterative/link-check)`
 
-### linkOptions: Map<string, options>
+#### linkOptions: Map<string, options>
 
 This object determines settings that will be applied for each hostname. The keys
 will be tried as a micromatch pattern against each link's hostname, and the
@@ -185,12 +191,8 @@ To specify multiple patterns, use the relevant flag multiple times.
 
 ## Contributing
 
-The source repo can be found at
-[iterative/link-check](https://github.com/iterative/link-check). There's also a
-dist repo for the GitHub Action at
-[iterative/link-check.action](https://github.com/iterative/link-check.action),
-which serves to host only the code required to run in GitHub Actions CI and be
-posted on the marketplace.
+In its current state, most of this project is a standard node CLI package
+published on NPM. The reusable GitHub Actions deploy through GitHub
 
 To manually test the source, build it with `yarn build` and then run
 `node dist/cli.js` with whatever flags you would otherwise pass to
