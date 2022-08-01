@@ -39,9 +39,26 @@ them out in
 
 ## Configuration
 
-This application is configured primarily through a configuration file whose path
-is specified with the `--configFile` (or `-c`) option. Other options that
+This application is configured primarily through a YAML configuration file whose
+path is specified with the `--configFile` (or `-c`) option. Other options that
 override the file can be specified with flags.
+
+For example, this is what a configuration file could look like:
+
+```yml
+rootURL: https://dvc.org
+fileIncludePatterns: '{.github,content,src}/**/*!(.test).{css,js,jsx,md,tsx,ts,json}'
+fileExcludePatternFile: config/link-check/excluded-files.yml
+linkExcludePatternFile: config/link-check/excluded-links.yml
+linkOptions:
+  '*.wikipedia.org':
+    minTime: 2000
+    maxConcurrent: 1
+
+  '(*.)?github.com':
+    minTime: 1000
+    maxConcurrent: 1
+```
 
 ### Options
 
