@@ -192,7 +192,8 @@ To specify multiple patterns, use the relevant flag multiple times.
 ## Contributing
 
 In its current state, most of this project is a standard node CLI package
-published on NPM. The reusable GitHub Actions deploy through GitHub
+published on NPM. The reusable GitHub Actions in `.github/workflows` deploy
+through GitHub, but are contributed to the same as any other code.
 
 To manually test the source, build it with `yarn build` and then run
 `node dist/cli.js` with whatever flags you would otherwise pass to
