@@ -3,6 +3,7 @@ on:
   workflow_call:
     inputs:
       config:
+        type: 'string'
         description: 'The path to the link-check config file'
         default: 'config/link-check/config.yml'
 jobs:
