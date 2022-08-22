@@ -26,6 +26,7 @@ jobs:
       - uses: iterative/setup-cml@v1
       - name: Run Link Check
         id: check
+        continue-on-error: true
         run: |
           npx repo-link-check \
             ${{ inputs.failsOnly && '-f' || '' }} \
