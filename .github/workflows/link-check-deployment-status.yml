@@ -36,6 +36,6 @@ jobs:
             > output.md
 
       - name: Create or update comment
-        run: cml send-comment --update output.md
+        run: cml send-comment --pr --update output.md
         env:
           REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
