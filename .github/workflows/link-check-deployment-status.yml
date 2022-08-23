@@ -12,6 +12,11 @@ on:
         required: false
         description: "If true, only reports failed links"
         default: true
+      outputFile:
+        type: "string"
+        required: false
+        description: "The file the link check report will be written to before publishing"
+        default: "link-check-report.md"
 jobs:
   run:
     name: Run
@@ -24,6 +29,7 @@ jobs:
         with:
           fetch-depth: 0
       - uses: iterative/setup-cml@v1
+      - run: echo "# Link Check Report" > ${{ inputs.outputFile }}
       - name: Run Link Check
         id: check
         continue-on-error: true
@@ -33,9 +39,9 @@ jobs:
             -d ${{ inputs.branch }} \
             -c config/link-check/config.yml \
             -r ${{ github.event.deployment.payload.web_url }} \
-            > output.md
+            > ${{ inputs.outputFile }}
 
       - name: Create or update comment
-        run: cml send-comment --pr --update output.md
+        run: cml send-comment --pr --update ${{ inputs.outputFile }}
         env:
           REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
