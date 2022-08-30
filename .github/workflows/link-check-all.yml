@@ -1,0 +1,19 @@
+name: Check all links in the repository
+on:
+  workflow_call:
+    inputs:
+      config:
+        type: 'string'
+        description: 'The path to the link-check config file'
+        default: 'config/link-check/config.yml'
+jobs:
+  run:
+    name: Link Check All
+    runs-on: ubuntu-latest
+    env:
+      NODE_OPTIONS: '--max-http-header-size=65536'
+    steps:
+      - uses: actions/checkout@v3
+      - name: Run Link Check
+        id: check
+        run: npx repo-link-check -c ${{ inputs.config }}
