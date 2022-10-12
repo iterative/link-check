@@ -29,6 +29,7 @@ jobs:
         with:
           fetch-depth: 0
       - uses: iterative/setup-cml@v1
+      - run: echo "%{{ toJSON(github.event) }}"
       - run: echo "# Link Check Report" > ${{ inputs.outputFile }}
       - name: Run Link Check
         id: check
