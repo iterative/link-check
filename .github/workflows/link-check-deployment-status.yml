@@ -22,7 +22,7 @@ jobs:
     name: Run
     runs-on: ubuntu-latest
     if:
-      github.event.deployment.ref != ${{ inputs.branch }} &&
+      github.event.deployment.ref == ${{ inputs.branch }} &&
       github.event.deployment_status.state == 'success'
     steps:
       - uses: actions/checkout@v3
