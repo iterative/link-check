@@ -8,6 +8,10 @@ Markdown sample with a [link to Google](https://www.google.com), one [with a URL
 - Finally a few [ref] [links][links] [here][link-here]
 - BTW it shouldn't plain links like http://www.this.com or that.com shouldn't get picked up.
 
+this is a test [ref]:
+
+https://www.ref.com
+
 [ref]: https://www.ref.com
 [links]:
   www.links.in/newline
