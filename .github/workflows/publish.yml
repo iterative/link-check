@@ -13,7 +13,6 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
           scope: '@dvcorg'
       - run: |
-          cd ./packages/gatsby-theme-iterative
           yarn publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
