@@ -93,6 +93,7 @@ jobs:
 
       - name: Create or Update Issue
         uses: peter-evans/create-issue-from-file@v4
+        if: failure()
         with:
           issue-number: ${{ steps.find-existing-comment.outputs.result }}
           title: ${{ inputs.title }}
