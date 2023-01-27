@@ -62,7 +62,7 @@ jobs:
         id: check
         continue-on-error: true
         run: |
-          npx repo-link-check \
+          npx repo-link-check@latest \
             ${{ inputs.failsOnly && '-f' || '' }} \
             -c ${{ inputs.config }} \
             -r ${{ inputs.rootURL }} \
