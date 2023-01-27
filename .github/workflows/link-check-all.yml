@@ -54,6 +54,7 @@ jobs:
       NODE_OPTIONS: '--max-http-header-size=65536'
     steps:
       - uses: actions/checkout@v3
+      - run: echo "# Link Check Report" > ${{ inputs.outputFile }}
       - name: Run Link Check
         id: check
         run: |
