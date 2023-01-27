@@ -1,7 +1,5 @@
 name: Check all links in the repository
 on:
-  pull_request:
-  workflow_dispatch:
   workflow_call:
     inputs:
       rootURL:

@@ -1,0 +1,17 @@
+name: Download Link Check Test
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: scheduled-download-link-check-${{ github.head_ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    uses: './.github/workflows/download-link-check-issue.yml'
+    with:
+      title: 'Whole Site Link Checker Report'
+      owner: 'iterative'
+      repo: 'link-check'
