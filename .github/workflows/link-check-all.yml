@@ -2,10 +2,6 @@ name: Check all links in the repository
 on:
   workflow_call:
     inputs:
-      rootURL:
-        type: 'string'
-        description: 'The URL to check relative links against'
-        required: false
       failsOnly:
         type: "boolean"
         required: false
@@ -64,9 +60,7 @@ jobs:
         run: |
           npx repo-link-check@latest \
             ${{ inputs.failsOnly && '-f' || '' }} \
-            ${{ inputs.rootURL && "-r ${{inputs.rootURL}}" || '' }} \
             -c ${{ inputs.config }} \
-            -r ${{ inputs.rootURL }} \
             >> ${{ inputs.outputFile }}
 
       - name: Find latest open Link Check issue
