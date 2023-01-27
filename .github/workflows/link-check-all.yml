@@ -56,7 +56,6 @@ jobs:
       - uses: actions/checkout@v3
       - name: Run Link Check
         id: check
-        continue-on-error: true
         run: |
           npx repo-link-check@latest \
             ${{ inputs.failsOnly && '-f' || '' }} \
@@ -66,6 +65,7 @@ jobs:
       - name: Find latest open Link Check issue
         uses: actions/github-script@v6
         id: find-existing-comment
+        if: always()
         env:
           OWNER: ${{ inputs.owner }}
           REPO: ${{ inputs.repo }}
