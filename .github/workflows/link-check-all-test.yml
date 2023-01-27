@@ -10,7 +10,7 @@ concurrency:
 
 jobs:
   check:
-    uses: './.github/workflows/download-link-check-issue.yml'
+    uses: './.github/workflows/link-check-all.yml'
     with:
       title: 'Whole Site Link Checker Report'
       owner: 'iterative'
