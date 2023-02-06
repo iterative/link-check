@@ -45,7 +45,7 @@
   },
   "dependencies": {
     "bottleneck": "^2.19.5",
-    "commander": "^9.4.0",
+    "commander": "^10.0.0",
     "execa": "^6.1.0",
     "fast-glob": "^3.2.11",
     "js-yaml": "^4.1.0",
