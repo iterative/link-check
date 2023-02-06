@@ -17,6 +17,10 @@ on:
         required: false
         description: "The file the link check report will be written to before publishing"
         default: "link-check-report.md"
+      config:
+        type: 'string'
+        description: 'The path to the link-check config file'
+        default: 'config/link-check/config.yml'
 jobs:
   run:
     name: Run
@@ -37,11 +41,10 @@ jobs:
           npx repo-link-check \
             ${{ inputs.failsOnly && '-f' || '' }} \
             -d ${{ inputs.branch }} \
-            -c config/link-check/config.yml \
+            -c ${{ inputs.config }} \
             -r ${{ github.event.deployment.payload.web_url }} \
             >> ${{ inputs.outputFile }}
-
       - name: Create or update comment
-        run: cml send-comment --pr --update ${{ inputs.outputFile }}
+        run: cml comment update --watermark-title="Link Check Report" ${{ inputs.outputFile }}
         env:
           REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}

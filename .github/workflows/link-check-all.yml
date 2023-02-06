@@ -2,10 +2,50 @@ name: Check all links in the repository
 on:
   workflow_call:
     inputs:
+      failsOnly:
+        type: "boolean"
+        required: false
+        description: "If true, only reports failed links"
+        default: true
+      outputFile:
+        type: "string"
+        required: false
+        description: "The file the link check report will be written to before publishing"
+        default: "link-check-report.md"
       config:
         type: 'string'
         description: 'The path to the link-check config file'
         default: 'config/link-check/config.yml'
+      owner:
+        description:
+          The owner of repository to operate on if the event doesn't include it
+        required: false
+        type: string
+        default: '${{ github.event.repository.owner.login }}'
+      repo:
+        description:
+          The repository to operate on if the event doesn't include it
+        required: false
+        type: string
+        default: '${{ github.event.repository.name }}'
+      label:
+        description:
+          The label that will be used to identify existing link-check reports to
+          edit
+        required: false
+        type: string
+        default: link-check-all
+      labels:
+        description:
+          The labels that will be assigned to issues created by this workflow
+        required: false
+        type: string
+        default: link-check-all
+      title:
+        description: The title of the issue created by this workflow
+        required: false
+        type: string
+        default: 'Link Checker Report'
 jobs:
   run:
     name: Link Check All
@@ -14,6 +54,53 @@ jobs:
       NODE_OPTIONS: '--max-http-header-size=65536'
     steps:
       - uses: actions/checkout@v3
+      - run: echo "# Link Check Report" > ${{ inputs.outputFile }}
       - name: Run Link Check
         id: check
-        run: npx repo-link-check -c ${{ inputs.config }}
+        run: |
+          npx repo-link-check@latest \
+            ${{ inputs.failsOnly && '-f' || '' }} \
+            -c ${{ inputs.config }} \
+            >> ${{ inputs.outputFile }}
+
+      - name: Find latest open Link Check issue
+        uses: actions/github-script@v6
+        id: find-existing-comment
+        if: always()
+        env:
+          OWNER: ${{ inputs.owner }}
+          REPO: ${{ inputs.repo }}
+          LABEL: ${{ inputs.label }}
+        with:
+          script: |
+            const { OWNER, REPO, LABEL } = process.env
+            const options = {
+              owner: OWNER,
+              repo: REPO,
+              labels: LABEL,
+              state: "open",
+              creator: "github-actions[bot]",
+              sort: "created"
+            }
+            const issues = await github.rest.issues.listForRepo(options)
+            if(issues && issues.data && issues.data[0]) {
+              return issues.data[0].number
+            }
+
+      - name: Create or Update Issue
+        uses: peter-evans/create-issue-from-file@v4
+        if: failure()
+        with:
+          issue-number: ${{ steps.find-existing-comment.outputs.result }}
+          title: ${{ inputs.title }}
+          content-filepath: ${{ inputs.outputFile }}
+          labels: ${{ inputs.labels }}
+
+      - name: Close if Check Passes
+        uses: peter-evans/close-issue@v2.2.0
+        if: >-
+          success() &&
+          steps.find-existing-comment.outputs.result
+        with:
+          issue-number: ${{ steps.find-existing-comment.outputs.result }}
+          comment: The most recent link check passed!
