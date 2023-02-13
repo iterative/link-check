@@ -1,49 +1,22 @@
 {
   "extends": [
-    "plugin:react/recommended",
     "plugin:@typescript-eslint/recommended",
     "plugin:prettier/recommended",
-    "plugin:jsx-a11y/recommended",
-    "plugin:json/recommended",
     "prettier"
   ],
   "plugins": ["@typescript-eslint"],
   "parser": "@typescript-eslint/parser",
-  "parserOptions": {
-    "ecmaFeatures": {
-      "jsx": true
-    }
-  },
   "env": {
-    "browser": true,
+    "browser": false,
     "jest": true
   },
-  "settings": {
-    "react": {
-      "version": "detect"
-    }
-  },
   "rules": {
-    "@typescript-eslint/naming-convention": [
-      "error",
-      {
-        "selector": "interface",
-        "format": ["PascalCase"],
-        "prefix": ["I"]
-      },
-      {
-        "selector": "variableLike",
-        "format": ["camelCase", "UPPER_CASE", "PascalCase"],
-        "leadingUnderscore": "allow"
-      }
-    ],
     "no-tabs": [
       "error",
       {
         "allowIndentationTabs": true
       }
     ],
-    "react/prop-types": "off",
     "@typescript-eslint/no-unused-vars": "error"
   },
   "overrides": [
@@ -54,5 +27,6 @@
         "@typescript-eslint/explicit-function-return-type": "off"
       }
     }
-  ]
+  ],
+  "ignorePatterns": ["dist/**/*"]
 }

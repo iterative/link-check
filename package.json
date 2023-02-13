@@ -7,13 +7,15 @@
   "license": "MIT",
   "private": false,
   "scripts": {
-    "check-format": "prettier -c \"**/*.{js,json,ts,tsx,css,md,mdx}\"",
-    "check-lint": "eslint \"**/*.{js,jsx,ts,tsx,json}\"",
+    "format": "prettier --write",
+    "format-check-all": "prettier --check \"**/*.{js,jsx,md,tsx,ts,json}\"",
+    "format-all": "prettier --write \"**/*.{js,jsx,md,tsx,ts,json}\"",
+    "lint": "eslint \"**/*.{js,jsx,ts,tsx}\"",
+    "lint-fix": "eslint --fix \"**/*.{js,jsx,ts,tsx}\"",
     "lint-ts": "tsc --noEmit --skipLibCheck",
+    "fix-all": "yarn format-all && yarn lint-fix && yarn lint-ts",
     "prepare": "husky install",
-    "build": "webpack",
-    "lint": "eslint --cache --fix '**/*.{js,ts}' && tsc --noEmit",
-    "format": "prettier --write '**/*.{js,ts,json,yml,md}'"
+    "build": "webpack"
   },
   "devDependencies": {
     "@babel/core": "^7.18.9",
@@ -43,7 +45,6 @@
     "webpack": "^5.74.0",
     "webpack-bundle-analyzer": "^4.5.0",
     "webpack-cli": "^4.10.0",
-    "webpack-merge": "^5.8.0",
     "webpack-node-externals": "^3.0.0"
   },
   "dependencies": {
