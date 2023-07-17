@@ -1,7 +1,6 @@
 const webpack = require('webpack')
 const path = require('path')
 const TerserPlugin = require('terser-webpack-plugin')
-const { merge } = require('webpack-merge')
 
 module.exports = {
   context: path.join(__dirname, 'src'),
