@@ -29,7 +29,7 @@ const scrapeFromString: (filePath: string, content: string) => string[] = (
       )
       const mdRefLinks = regexMap(
         content,
-        /\[.*\]:[^\S\r\n]*\n?[^\S\r\n]*([\w\d./?=#\-&_~:;,@+$!*()]+)/gm,
+        /\[.*\]:[^\S\r\n]*\n?[^\S\r\n]*((?:\/|https?:\/\/|www)\S*)/gm,
         x => x[2] || x[1]
       )
       const hrefLinks = regexMap(content, /href="(.*?)"/gm)
