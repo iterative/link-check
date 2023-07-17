@@ -7,7 +7,7 @@
   "license": "MIT",
   "private": false,
   "scripts": {
-    "prepare": "husky install",
+    "prepare": "node -e \"if (process.env.NODE_ENV !== 'production'){process.exit(1)} \" || husky install",
     "build": "webpack",
     "lint": "eslint --cache --fix '**/*.{js,ts}' && tsc --noEmit",
     "format": "prettier --write '**/*.{js,ts,json,yml,md}'"
