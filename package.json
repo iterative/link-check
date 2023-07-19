@@ -67,6 +67,10 @@
       "pre-commit": "lint-staged"
     }
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/iterative/link-check.git"
+  },
   "lint-staged": {
     "*.{js,ts}": "eslint --cache --fix",
     "*.{js,ts,json,md}": "prettier --write"
