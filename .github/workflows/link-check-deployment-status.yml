@@ -47,7 +47,7 @@ jobs:
             -r ${{ github.event.deployment.payload.web_url }} \
             >> ${{ inputs.outputFile }}
       - name: Create or update comment
-        uses: actions/github-script@v7
+        uses: actions/github-script@v9
         env:
           OUTPUT_FILE: ${{ inputs.outputFile }}
         with:
