@@ -32,7 +32,7 @@ jobs:
       github.event.deployment.ref != inputs.branch &&
       github.event.deployment_status.state == 'success'
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - run: echo "# Link Check Report" > ${{ inputs.outputFile }}
