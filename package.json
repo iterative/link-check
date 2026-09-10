@@ -13,9 +13,9 @@
     "format": "prettier --write '**/*.{js,ts,json,yml,md}'"
   },
   "devDependencies": {
-    "@babel/core": "^7.22.9",
-    "@babel/preset-env": "^7.22.9",
-    "@babel/preset-typescript": "^7.22.5",
+    "@babel/core": "^8.0.0",
+    "@babel/preset-env": "^8.0.0",
+    "@babel/preset-typescript": "^8.0.0",
     "@types/commander": "^2.12.2",
     "@types/js-yaml": "^4.0.5",
     "@types/lodash": "^4.14.195",
